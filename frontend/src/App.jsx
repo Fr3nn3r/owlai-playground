@@ -13,9 +13,12 @@ function App() {
   const [loadingAgents, setLoadingAgents] = useState(true);
   const [loadingQuery, setLoadingQuery] = useState(false);
   const [error, setError] = useState("");
-  const [conversation, setConversation] = useState([]);
+  const [conversations, setConversations] = useState({}); // Store conversations per agent
 
   const API_URL = import.meta.env.VITE_API_URL;
+
+  // Get current conversation for selected agent
+  const currentConversation = conversations[selectedAgent] || [];
 
   useEffect(() => {
     const AGENT_API_URL = `${API_URL}/agents`;
@@ -36,6 +39,12 @@ function App() {
         }
         setAgents(data);
         setSelectedAgent(data[0].id);
+        // Initialize empty conversations for each agent
+        const initialConversations = data.reduce((acc, agent) => {
+          acc[agent.id] = [];
+          return acc;
+        }, {});
+        setConversations(initialConversations);
       })
       .catch((err) => {
         console.error("❌ Failed to fetch agents:", err);
@@ -63,11 +72,15 @@ function App() {
       const data = await res.json();
       setResponse(data.answer);
       
-      // Add to conversation history
-      setConversation(prev => [...prev, 
-        { role: 'user', content: question },
-        { role: 'assistant', content: data.answer }
-      ]);
+      // Add to conversation history for the current agent
+      setConversations(prev => ({
+        ...prev,
+        [selectedAgent]: [
+          ...(prev[selectedAgent] || []),
+          { role: 'user', content: question },
+          { role: 'assistant', content: data.answer }
+        ]
+      }));
       setQuestion(''); // Clear input after successful submission
     } catch (error) {
       console.error("Error querying agent:", error);
@@ -131,7 +144,7 @@ function App() {
 
             {/* Conversation History */}
             <div className="mt-6 space-y-4">
-              {conversation.map((msg, index) => (
+              {currentConversation.map((msg, index) => (
                 <div key={index} className={`p-4 rounded-lg ${
                   msg.role === 'user' ? 'bg-pink-50 ml-4' : 'bg-gray-50 mr-4'
                 }`}>
