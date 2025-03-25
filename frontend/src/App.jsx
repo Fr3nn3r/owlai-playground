@@ -10,7 +10,7 @@ function App() {
   const [response, setResponse] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8000/agents")
+    fetch("https://owlai-backend.onrender.com//agents")
       .then((res) => res.json())
       .then((data) => {
         setAgents(data);
@@ -26,7 +26,7 @@ function App() {
   
     setResponse("Loading...");
     try {
-      const res = await fetch("http://localhost:8000/query", {
+      const res = await fetch("https://owlai-backend.onrender.com/query", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
