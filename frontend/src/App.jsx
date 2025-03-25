@@ -9,17 +9,32 @@ function App() {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
 
+
+
   useEffect(() => {
-    fetch("https://owlai-backend.onrender.com/agents")
-      .then((res) => res.json())
+    const AGENT_API_URL = "https://owlai-backend.onrender.com/agents";
+    console.log("📡 Fetching agents from:", AGENT_API_URL);
+  
+    setLoadingAgents(true);
+    setError("");
+  
+    fetch(AGENT_API_URL)
+      .then((res) => {
+        console.log("🔁 Agent fetch response:", res.status);
+        return res.json();
+      })
       .then((data) => {
+        console.log("✅ Agent list received:", data);
         setAgents(data);
         setSelectedAgent(data[0]?.id || "");
       })
       .catch((err) => {
-        console.error("Failed to fetch agents", err);
-      });
+        console.error("❌ Failed to fetch agents:", err);
+        setError("Failed to load agents. Please try again later.");
+      })
+      .finally(() => setLoadingAgents(false));
   }, []);
+
   
   const handleSubmit = async () => {
     if (!question || !selectedAgent) return;
