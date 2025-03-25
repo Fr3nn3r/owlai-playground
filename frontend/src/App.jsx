@@ -5,6 +5,7 @@ import ResponseDisplay from "./components/ResponseDisplay";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorMessage from "./components/ErrorMessage";
 import DefaultQueries from "./components/DefaultQueries";
+import config from "./config";
 
 function App() {
   const [agents, setAgents] = useState([]);
@@ -17,7 +18,7 @@ function App() {
   const [conversations, setConversations] = useState({});
   const [defaultQueries, setDefaultQueries] = useState([]);
 
-  const API_URL = import.meta.env.VITE_API_URL;
+  const { API_URL } = config;
 
   // Get current conversation for selected agent
   const currentConversation = selectedAgent ? conversations[selectedAgent.id] || [] : [];
@@ -32,6 +33,7 @@ function App() {
     fetch(AGENT_API_URL)
       .then((res) => {
         console.log("🔁 Agent fetch response:", res.status);
+        if (!res.ok) throw new Error("Failed to fetch agents");
         return res.json();
       })
       .then((data) => {
@@ -120,7 +122,7 @@ function App() {
   return (
     <div 
       className="min-h-screen bg-gradient-to-b from-pink-50 to-white text-gray-900 p-6"
-      style={selectedAgent ? {
+      style={selectedAgent?.color_theme ? {
         background: `linear-gradient(to bottom, ${selectedAgent.color_theme.primary}10, white)`
       } : {}}
     >
