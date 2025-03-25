@@ -24,3 +24,14 @@ def query_agent(payload: QueryRequest):
         "question": payload.question,
         "answer": f"This is a mock answer to: '{payload.question}' from agent '{payload.agent_id}'.",
     }
+
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict this later to just your frontend domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

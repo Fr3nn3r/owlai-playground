@@ -10,19 +10,38 @@ function App() {
   const [response, setResponse] = useState("");
 
   useEffect(() => {
-    // TEMP: Mock agents
-    const fakeAgents = [
-      { id: "agent1", name: "Agent Alpha" },
-      { id: "agent2", name: "Agent Beta" },
-    ];
-    setAgents(fakeAgents);
-    setSelectedAgent(fakeAgents[0].id);
+    fetch("http://localhost:8000/agents")
+      .then((res) => res.json())
+      .then((data) => {
+        setAgents(data);
+        setSelectedAgent(data[0]?.id || "");
+      })
+      .catch((err) => {
+        console.error("Failed to fetch agents", err);
+      });
   }, []);
-
+  
   const handleSubmit = async () => {
-    setResponse("This is a mock response for: " + question);
-    // Replace with actual fetch later
+    if (!question || !selectedAgent) return;
+  
+    setResponse("Loading...");
+    try {
+      const res = await fetch("http://localhost:8000/query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question, agent_id: selectedAgent }),
+      });
+  
+      const data = await res.json();
+      setResponse(data.answer);
+    } catch (error) {
+      console.error("Error querying agent:", error);
+      setResponse("Something went wrong. Please try again.");
+    }
   };
+  
 
   return (
     <div className="max-w-xl mx-auto mt-10 p-4 space-y-4">
