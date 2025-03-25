@@ -10,7 +10,7 @@ function App() {
   const [response, setResponse] = useState("");
 
   useEffect(() => {
-    fetch("https://owlai-backend.onrender.com//agents")
+    fetch("https://owlai-backend.onrender.com/agents")
       .then((res) => res.json())
       .then((data) => {
         setAgents(data);
