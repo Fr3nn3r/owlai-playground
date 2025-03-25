@@ -1,7 +1,31 @@
 from fastapi import FastAPI
-from app.data.agents import get_all_agents
+from fastapi.middleware.cors import CORSMiddleware
+from .data.agents import get_all_agents
+import logging
+from owlai.edwige import AgentManager
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+# Configure CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Specifically allow your frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize AgentManager
+try:
+    agent_manager = AgentManager()
+    logger.info("AgentManager initialized successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize AgentManager: {str(e)}")
+    agent_manager = None
 
 
 @app.get("/agents")
@@ -24,14 +48,3 @@ def query_agent(payload: QueryRequest):
         "question": payload.question,
         "answer": f"This is a mock answer to: '{payload.question}' from agent '{payload.agent_id}'.",
     }
-
-
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # You can restrict this later to just your frontend domain
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
