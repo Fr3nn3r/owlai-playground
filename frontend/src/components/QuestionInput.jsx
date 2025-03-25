@@ -1,5 +1,8 @@
-export default function QuestionInput({ question, setQuestion, onSubmit }) {
-  const handleKeyDown = (e) => {
+import React from 'react';
+import PropTypes from 'prop-types';
+
+const QuestionInput = ({ question, setQuestion, onSubmit, style }) => {
+  const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       onSubmit();
@@ -8,12 +11,25 @@ export default function QuestionInput({ question, setQuestion, onSubmit }) {
 
   return (
     <textarea
-      className="border-2 border-pink-300 p-2 w-full rounded resize-none"
-      rows="4"
       value={question}
       onChange={(e) => setQuestion(e.target.value)}
-      onKeyDown={handleKeyDown}
-      placeholder="Ask a legal question... (Press Enter to submit)"
+      onKeyPress={handleKeyPress}
+      placeholder="Type your question here... (Press Enter to submit)"
+      className="w-full p-3 border-2 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200"
+      style={{
+        minHeight: '60px',
+        maxHeight: '200px',
+        ...style
+      }}
     />
   );
-}
+};
+
+QuestionInput.propTypes = {
+  question: PropTypes.string.isRequired,
+  setQuestion: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  style: PropTypes.object,
+};
+
+export default QuestionInput;
