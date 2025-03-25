@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import AgentSelector from "./components/AgentSelector";
 import QuestionInput from "./components/QuestionInput";
 import ResponseDisplay from "./components/ResponseDisplay";
+import LoadingSpinner from "./components/LoadingSpinner";
+import ErrorMessage from "./components/ErrorMessage";
 
 function App() {
   const [agents, setAgents] = useState([]);
@@ -70,27 +72,58 @@ function App() {
   
 
   return (
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white text-gray-900 p-6">
+      <div className="max-w-2xl mx-auto bg-white shadow-xl p-8 rounded-2xl space-y-6">
+        <div className="flex flex-col items-center space-y-4">
+          <img 
+            src="/owl-default.jpg" 
+            alt="Owl Agent" 
+            className="w-32 h-32 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-200" 
+          />
+          <h1 className="text-3xl font-bold text-center text-pink-600">
+            Posez une question de droit à Marianne
+          </h1>
+        </div>
 
-<div className="min-h-screen bg-pink-50 text-gray-900 p-6">
-  <div className="max-w-xl mx-auto bg-white shadow-xl p-6 rounded-2xl space-y-4">
-
-    <div className="flex flex-col items-center space-y-2">
-      <img src="/owl-default.jpg" alt="Owl Agent" className="w-32 h-32 rounded-full shadow-md" />
-      <h1 className="text-3xl font-bold text-center text-pink-600">Posez une question de droit à Marianne</h1>
+        {loadingAgents ? (
+          <div className="flex justify-center py-8">
+            <LoadingSpinner />
+          </div>
+        ) : error ? (
+          <ErrorMessage 
+            message={error} 
+            onRetry={() => window.location.reload()} 
+          />
+        ) : (
+          <>
+            <AgentSelector 
+              agents={agents} 
+              selectedAgent={selectedAgent} 
+              setSelectedAgent={setSelectedAgent} 
+            />
+            <QuestionInput 
+              question={question} 
+              setQuestion={setQuestion} 
+            />
+            <button
+              onClick={handleSubmit}
+              disabled={loadingQuery || !question || !selectedAgent}
+              className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg w-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+            >
+              {loadingQuery ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <LoadingSpinner />
+                  <span>Thinking...</span>
+                </div>
+              ) : (
+                "Submit"
+              )}
+            </button>
+            <ResponseDisplay response={response} />
+          </>
+        )}
+      </div>
     </div>
-
-      <AgentSelector agents={agents} selectedAgent={selectedAgent} setSelectedAgent={setSelectedAgent} />
-      <QuestionInput question={question} setQuestion={setQuestion} />
-      <button
-  onClick={handleSubmit}
-  disabled={loadingQuery}
-  className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg w-full transition-colors disabled:opacity-50"
->
-  {loadingQuery ? "Thinking..." : "Submit"}
-</button>
-      <ResponseDisplay response={response} />
-    </div>
-  </div>
   );
 }
 
