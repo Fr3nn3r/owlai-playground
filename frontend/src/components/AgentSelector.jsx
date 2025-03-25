@@ -23,10 +23,12 @@ const AgentSelector = ({ agents, selectedAgent, onSelect, className }) => {
   };
 
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${className}`}>
+    <div role="list" className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${className}`}>
       {agents.map((agent) => (
         <div
           key={agent.id}
+          role="button"
+          tabIndex={0}
           className={`p-4 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-105 ${
             selectedAgent?.id === agent.id
               ? 'ring-2 ring-offset-2'
@@ -38,6 +40,11 @@ const AgentSelector = ({ agents, selectedAgent, onSelect, className }) => {
             borderWidth: '2px',
           }}
           onClick={() => onSelect(agent)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              onSelect(agent);
+            }
+          }}
         >
           <div className="flex items-start space-x-4">
             <div className="relative w-16 h-16">
