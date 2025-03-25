@@ -58,6 +58,36 @@ function App() {
   };
   
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-red-50 text-red-800 p-10 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">🚨 Something went wrong</h1>
+          <p className="mt-2">{error}</p>
+          <p className="text-sm mt-4">Please refresh or try again later.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingAgents) {
+    return (
+      <div className="min-h-screen bg-gray-100 text-center flex items-center justify-center">
+        <p className="text-xl text-gray-600 animate-pulse">🦉 Loading agents...</p>
+      </div>
+    );
+  }
+
+
+  if (!agents.length) {
+    return (
+      <div className="min-h-screen bg-yellow-50 flex items-center justify-center text-yellow-700">
+        <p>No agents available. Please check your backend data.</p>
+      </div>
+    );
+  }
+
+
   return (
 
 <div className="min-h-screen bg-pink-50 text-gray-900 p-6">
