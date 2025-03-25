@@ -9,39 +9,24 @@ function App() {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
 
-
-
   useEffect(() => {
-    const AGENT_API_URL = "https://owlai-backend.onrender.com/agents";
-    console.log("📡 Fetching agents from:", AGENT_API_URL);
-  
-    setLoadingAgents(true);
-    setError("");
-  
-    fetch(AGENT_API_URL)
-      .then((res) => {
-        console.log("🔁 Agent fetch response:", res.status);
-        return res.json();
-      })
+    fetch("http://localhost:8000/agents")
+      .then((res) => res.json())
       .then((data) => {
-        console.log("✅ Agent list received:", data);
         setAgents(data);
         setSelectedAgent(data[0]?.id || "");
       })
       .catch((err) => {
-        console.error("❌ Failed to fetch agents:", err);
-        setError("Failed to load agents. Please try again later.");
-      })
-      .finally(() => setLoadingAgents(false));
+        console.error("Failed to fetch agents", err);
+      });
   }, []);
-
   
   const handleSubmit = async () => {
     if (!question || !selectedAgent) return;
   
     setResponse("Loading...");
     try {
-      const res = await fetch("https://owlai-backend.onrender.com/query", {
+      const res = await fetch("http://localhost:8000/query", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,36 +42,6 @@ function App() {
     }
   };
   
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-red-50 text-red-800 p-10 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">🚨 Something went wrong</h1>
-          <p className="mt-2">{error}</p>
-          <p className="text-sm mt-4">Please refresh or try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (loadingAgents) {
-    return (
-      <div className="min-h-screen bg-gray-100 text-center flex items-center justify-center">
-        <p className="text-xl text-gray-600 animate-pulse">🦉 Loading agents...</p>
-      </div>
-    );
-  }
-
-
-  if (!agents.length) {
-    return (
-      <div className="min-h-screen bg-yellow-50 flex items-center justify-center text-yellow-700">
-        <p>No agents available. Please check your backend data.</p>
-      </div>
-    );
-  }
-
 
   return (
 
