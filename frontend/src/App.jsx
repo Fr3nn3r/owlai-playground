@@ -44,15 +44,26 @@ function App() {
   
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-4 space-y-4">
-      <h1 className="text-2xl font-bold mb-4">OwlAI Agent Playground</h1>
+
+<div className="min-h-screen bg-pink-50 text-gray-900 p-6">
+  <div className="max-w-xl mx-auto bg-white shadow-xl p-6 rounded-2xl space-y-4">
+
+    <div className="flex flex-col items-center space-y-2">
+      <img src="/owl-default.jpg" alt="Owl Agent" className="w-32 h-32 rounded-full shadow-md" />
+      <h1 className="text-3xl font-bold text-center text-pink-600">Posez une question de droit à Marianne</h1>
+    </div>
+
       <AgentSelector agents={agents} selectedAgent={selectedAgent} setSelectedAgent={setSelectedAgent} />
       <QuestionInput question={question} setQuestion={setQuestion} />
-      <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded">
-        Submit
-      </button>
+      <button
+  onClick={handleSubmit}
+  className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg w-full transition-colors"
+>
+  Submit
+</button>
       <ResponseDisplay response={response} />
     </div>
+  </div>
   );
 }
 

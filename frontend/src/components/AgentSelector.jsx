@@ -1,7 +1,7 @@
 export default function AgentSelector({ agents, selectedAgent, setSelectedAgent }) {
   return (
     <select
-      className="border p-2 rounded w-full"
+      className="border-2 border-pink-300 p-2 rounded w-full"
       value={selectedAgent}
       onChange={(e) => setSelectedAgent(e.target.value)}
     >
