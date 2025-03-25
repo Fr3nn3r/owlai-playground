@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import AgentSelector from "./components/AgentSelector";
+import QuestionInput from "./components/QuestionInput";
+import ResponseDisplay from "./components/ResponseDisplay";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [agents, setAgents] = useState([]);
+  const [selectedAgent, setSelectedAgent] = useState("");
+  const [question, setQuestion] = useState("");
+  const [response, setResponse] = useState("");
+
+  useEffect(() => {
+    // TEMP: Mock agents
+    const fakeAgents = [
+      { id: "agent1", name: "Agent Alpha" },
+      { id: "agent2", name: "Agent Beta" },
+    ];
+    setAgents(fakeAgents);
+    setSelectedAgent(fakeAgents[0].id);
+  }, []);
+
+  const handleSubmit = async () => {
+    setResponse("This is a mock response for: " + question);
+    // Replace with actual fetch later
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="max-w-xl mx-auto mt-10 p-4 space-y-4">
+      <h1 className="text-2xl font-bold mb-4">OwlAI Agent Playground</h1>
+      <AgentSelector agents={agents} selectedAgent={selectedAgent} setSelectedAgent={setSelectedAgent} />
+      <QuestionInput question={question} setQuestion={setQuestion} />
+      <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded">
+        Submit
+      </button>
+      <ResponseDisplay response={response} />
+    </div>
+  );
 }
 
-export default App
+export default App;
