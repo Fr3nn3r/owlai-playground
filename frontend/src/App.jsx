@@ -13,6 +13,7 @@ function App() {
   const [loadingAgents, setLoadingAgents] = useState(true);
   const [loadingQuery, setLoadingQuery] = useState(false);
   const [error, setError] = useState("");
+  const [conversation, setConversation] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -61,6 +62,13 @@ function App() {
       if (!res.ok) throw new Error("Query failed.");
       const data = await res.json();
       setResponse(data.answer);
+      
+      // Add to conversation history
+      setConversation(prev => [...prev, 
+        { role: 'user', content: question },
+        { role: 'assistant', content: data.answer }
+      ]);
+      setQuestion(''); // Clear input after successful submission
     } catch (error) {
       console.error("Error querying agent:", error);
       setError("❌ Could not fetch agent response.");
@@ -103,7 +111,8 @@ function App() {
             />
             <QuestionInput 
               question={question} 
-              setQuestion={setQuestion} 
+              setQuestion={setQuestion}
+              onSubmit={handleSubmit}
             />
             <button
               onClick={handleSubmit}
@@ -119,7 +128,20 @@ function App() {
                 "Submit"
               )}
             </button>
-            <ResponseDisplay response={response} />
+
+            {/* Conversation History */}
+            <div className="mt-6 space-y-4">
+              {conversation.map((msg, index) => (
+                <div key={index} className={`p-4 rounded-lg ${
+                  msg.role === 'user' ? 'bg-pink-50 ml-4' : 'bg-gray-50 mr-4'
+                }`}>
+                  <div className="font-semibold mb-1">
+                    {msg.role === 'user' ? 'You' : 'Assistant'}
+                  </div>
+                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                </div>
+              ))}
+            </div>
           </>
         )}
       </div>
