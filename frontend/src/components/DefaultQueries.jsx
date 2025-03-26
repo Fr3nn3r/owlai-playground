@@ -7,25 +7,13 @@ const DefaultQueries = ({ queries, onQuerySelect, selectedAgent }) => {
   }
 
   return (
-    <div className="mt-4">
-      <h4 
-        className="text-sm font-medium mb-2"
-        style={{ color: selectedAgent.color_theme.primary }}
-      >
-        Suggested Questions:
-      </h4>
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-4">
+      <div className="flex flex-col gap-2">
         {queries.map((query, index) => (
           <button
             key={index}
             onClick={() => onQuerySelect(query)}
-            className="text-sm px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105"
-            style={{
-              backgroundColor: selectedAgent.color_theme.primary + '15',
-              borderColor: selectedAgent.color_theme.secondary,
-              borderWidth: '1px',
-              color: selectedAgent.color_theme.primary
-            }}
+            className="text-sm px-4 py-3 rounded-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-soft active:scale-95 text-left bg-white border border-neutral-200 hover:border-primary-light hover:bg-primary-50"
           >
             {query}
           </button>

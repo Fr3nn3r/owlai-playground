@@ -23,20 +23,20 @@ const AgentSelector = ({ agents, selectedAgent, onSelect, className }) => {
   };
 
   return (
-    <div role="list" className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${className}`}>
+    <div role="list" className={`flex flex-col ${className}`}>
       {agents.map((agent) => (
         <div
           key={agent.id}
           role="button"
           tabIndex={0}
-          className={`p-4 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+          className={`p-6 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:shadow-hover ${
             selectedAgent?.id === agent.id
-              ? 'ring-2 ring-offset-2'
-              : 'hover:shadow-lg'
+              ? 'ring-2 ring-offset-2 shadow-soft ring-primary'
+              : 'shadow-soft hover:shadow-glow'
           }`}
           style={{
-            backgroundColor: agent.color_theme.primary + '10',
-            borderColor: agent.color_theme.secondary,
+            backgroundColor: 'white',
+            borderColor: selectedAgent?.id === agent.id ? '#2563EB' : '#E5E7EB',
             borderWidth: '2px',
           }}
           onClick={() => onSelect(agent)}
@@ -51,30 +51,28 @@ const AgentSelector = ({ agents, selectedAgent, onSelect, className }) => {
               <img
                 src={getImageUrl(agent)}
                 alt={`${agent.name} owl avatar`}
-                className="w-16 h-16 rounded-full object-cover"
+                className="w-16 h-16 rounded-full object-cover shadow-soft transition-transform duration-300 hover:scale-110"
                 onError={() => handleImageError(agent.id)}
                 loading="lazy"
               />
               {failedImages.has(agent.id) && (
                 <div 
-                  className="absolute inset-0 flex items-center justify-center rounded-full text-xs text-gray-500"
+                  className="absolute inset-0 flex items-center justify-center rounded-full text-xs text-neutral-500"
                   style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
                 >
                   Using default
                 </div>
               )}
             </div>
-            <div>
+            <div className="flex-1">
               <h3 
-                className="text-lg font-semibold mb-1"
-                style={{ color: agent.color_theme.primary }}
+                className="text-lg font-semibold mb-2 tracking-tight text-neutral-800"
               >
                 {agent.name}
               </h3>
-              <p className="text-sm text-gray-600 mb-2">{agent.description}</p>
+              <p className="text-sm text-neutral-600 mb-2 leading-relaxed">{agent.description}</p>
               <p 
-                className="text-sm italic"
-                style={{ color: agent.color_theme.secondary }}
+                className="text-sm italic text-neutral-500"
               >
                 {agent.welcome_title}
               </p>
