@@ -7,7 +7,7 @@ def get_all_agents() -> List[Dict]:
     return [
         {
             "id": "agent1",
-            "name": "French Law Agent Alpha",
+            "name": "French Law Agent Alpha wefwefwfweBeta",
             "description": "Handles civil code queries.",
             "welcome_title": "Welcome to Civil Law Assistant",
             "owl_image_url": "https://example.com/owls/civil_law_owl.png",

@@ -103,7 +103,7 @@ async def stream_query(payload: QueryRequest):
     async def generate():
         # Simulate streaming response with multiple chunks
         chunks = [
-            f"Processing your question: '{payload.question}'...\n",
+            f"Processing your questionnnnn: '{payload.question}'...\n",
             "Analyzing the context...\n",
             "Generating response...\n",
             f"This is a mock streaming answer from agent '{payload.agent_id}'.\n",
