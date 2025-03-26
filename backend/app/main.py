@@ -16,17 +16,26 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# Configure CORS middleware
+# Configure CORS middleware with more permissive settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Development
-        "https://owlai-playground.vercel.app",  # Production
-    ],
+    allow_origins=["*"],  # Allow all origins in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
+
+
+# Add middleware to log requests
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.info(f"Request from origin: {request.headers.get('origin')}")
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    return response
+
 
 # Initialize AgentManager
 try:
