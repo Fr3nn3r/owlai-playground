@@ -114,34 +114,93 @@ function App() {
   
     setLoadingQuery(true);
     setError("");
-    
-    // Show typing indicator only when submitting
-    setIsTyping(true);
+    setIsTyping(true); // Show waiting box until first streaming characters arrive
     
     try {
-      const res = await fetch(`${API_URL}/query`, {
+      const response = await fetch(`${API_URL}/stream-query`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ question, agent_id: selectedAgent.id }),
       });
-  
-      if (!res.ok) throw new Error("Query failed.");
-      const data = await res.json();
-      
-      // Add assistant response
-      setConversations(prev => ({
-        ...prev,
-        [selectedAgent.id]: [
-          ...(prev[selectedAgent.id] || []),
-          { role: 'assistant', content: data.answer }
-        ]
-      }));
+
+      if (!response.ok) throw new Error("Stream query failed.");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let streamedResponse = "";
+      let isFirstChunk = true;
+
+      // Add user message to conversation only if it's not already there
+      setConversations(prev => {
+        const currentMessages = prev[selectedAgent.id] || [];
+        const lastMessage = currentMessages[currentMessages.length - 1];
+        
+        // If the last message is already from the user with the same content, don't add it again
+        if (lastMessage && lastMessage.role === 'user' && lastMessage.content === question) {
+          return prev;
+        }
+        
+        return {
+          ...prev,
+          [selectedAgent.id]: [
+            ...currentMessages,
+            { role: 'user', content: question }
+          ]
+        };
+      });
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6));
+            streamedResponse += data.content;
+            
+            // Hide waiting box after first chunk is received
+            if (isFirstChunk) {
+              setIsTyping(false);
+              isFirstChunk = false;
+            }
+            
+            // Update conversation with streaming response
+            setConversations(prev => {
+              const currentMessages = prev[selectedAgent.id] || [];
+              const lastMessage = currentMessages[currentMessages.length - 1];
+              
+              if (lastMessage && lastMessage.role === 'assistant') {
+                // Update existing assistant message
+                return {
+                  ...prev,
+                  [selectedAgent.id]: [
+                    ...currentMessages.slice(0, -1),
+                    { role: 'assistant', content: streamedResponse }
+                  ]
+                };
+              } else {
+                // Add new assistant message
+                return {
+                  ...prev,
+                  [selectedAgent.id]: [
+                    ...currentMessages,
+                    { role: 'assistant', content: streamedResponse }
+                  ]
+                };
+              }
+            });
+          }
+        }
+      }
       
       setQuestion(''); // Clear input after successful submission
     } catch (error) {
-      console.error("Error querying agent:", error);
+      console.error("Error streaming agent response:", error);
       setError("❌ Could not fetch agent response.");
       setConversations(prev => ({
         ...prev,
@@ -193,9 +252,6 @@ function App() {
     setLoadingQuery(true);
     setError("");
     
-    // Show typing indicator only when submitting
-    setIsTyping(true);
-    
     try {
       const response = await fetch(`${API_URL}/stream-query`, {
         method: "POST",
@@ -211,14 +267,24 @@ function App() {
       const decoder = new TextDecoder();
       let streamedResponse = "";
 
-      // Add user message to conversation
-      setConversations(prev => ({
-        ...prev,
-        [selectedAgent.id]: [
-          ...(prev[selectedAgent.id] || []),
-          { role: 'user', content: question }
-        ]
-      }));
+      // Add user message to conversation only if it's not already there
+      setConversations(prev => {
+        const currentMessages = prev[selectedAgent.id] || [];
+        const lastMessage = currentMessages[currentMessages.length - 1];
+        
+        // If the last message is already from the user with the same content, don't add it again
+        if (lastMessage && lastMessage.role === 'user' && lastMessage.content === question) {
+          return prev;
+        }
+        
+        return {
+          ...prev,
+          [selectedAgent.id]: [
+            ...currentMessages,
+            { role: 'user', content: question }
+          ]
+        };
+      });
 
       while (true) {
         const { done, value } = await reader.read();
@@ -274,7 +340,6 @@ function App() {
       }));
     } finally {
       setLoadingQuery(false);
-      setIsTyping(false);
     }
   };
 
@@ -331,6 +396,9 @@ function App() {
                     src={selectedAgent.owl_image_url || '/owl-default.jpg'}
                     alt={`${selectedAgent.name} owl`}
                     className="w-full h-full rounded-full object-cover shadow-soft"
+                    onError={(e) => {
+                      e.target.src = '/owl-default.jpg';
+                    }}
                   />
                   {loadingQuery && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 rounded-full">
@@ -366,14 +434,14 @@ function App() {
                           : '#374151'
                       }}
                     >
-                      {msg.role === 'user' ? 'You' : 'Assistant'}
+                      {msg.role === 'user' ? 'You' : selectedAgent?.name}
                     </div>
                     <div className="whitespace-pre-wrap leading-relaxed text-neutral-700">{msg.content}</div>
                   </div>
                 ))}
-                {loadingQuery && (
+                {isTyping && (
                   <div className="ml-4 bg-white p-4 rounded-xl shadow-soft animate-fadeIn">
-                    <div className="font-semibold mb-1 text-neutral-700">Assistant</div>
+                    <div className="font-semibold mb-1 text-neutral-700">{selectedAgent?.name}</div>
                     <TypingIndicator />
                   </div>
                 )}
@@ -398,36 +466,20 @@ function App() {
                         }
                       }}
                     />
-                    <div className="flex space-x-2 mt-2">
-                      <button
-                        onClick={handleSubmit}
-                        disabled={loadingQuery || !question || !selectedAgent}
-                        className="flex-1 px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-primary hover:bg-primary-dark active:scale-95"
-                      >
-                        {loadingQuery ? (
-                          <div className="flex items-center justify-center space-x-2">
-                            <LoadingSpinner />
-                            <span>Thinking...</span>
-                          </div>
-                        ) : (
-                          "Ask Question"
-                        )}
-                      </button>
-                      <button
-                        onClick={handleStreamSubmit}
-                        disabled={loadingQuery || !question || !selectedAgent}
-                        className="flex-1 px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-secondary hover:bg-secondary-dark active:scale-95"
-                      >
-                        {loadingQuery ? (
-                          <div className="flex items-center justify-center space-x-2">
-                            <LoadingSpinner />
-                            <span>Streaming...</span>
-                          </div>
-                        ) : (
-                          "Test Stream"
-                        )}
-                      </button>
-                    </div>
+                    <button
+                      onClick={handleSubmit}
+                      disabled={loadingQuery || !question || !selectedAgent}
+                      className="mt-2 px-6 py-3 rounded-xl w-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-primary hover:bg-primary-dark active:scale-95"
+                    >
+                      {loadingQuery ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <LoadingSpinner />
+                          <span>Thinking...</span>
+                        </div>
+                      ) : (
+                        "Ask Question"
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
