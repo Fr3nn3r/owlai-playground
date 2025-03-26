@@ -26,6 +26,27 @@ function App() {
   // Get current conversation for selected agent
   const currentConversation = selectedAgent ? conversations[selectedAgent.id] || [] : [];
 
+  // Update conversation when question is edited
+  useEffect(() => {
+    if (!question || !selectedAgent) return;
+
+    const currentMessages = conversations[selectedAgent.id] || [];
+    const lastMessage = currentMessages[currentMessages.length - 1];
+    
+    // If last message is from user and hasn't been responded to yet, update it
+    if (lastMessage && lastMessage.role === 'user' && 
+        (!currentMessages[currentMessages.length - 2] || 
+         currentMessages[currentMessages.length - 2].role === 'user')) {
+      setConversations(prev => ({
+        ...prev,
+        [selectedAgent.id]: [
+          ...currentMessages.slice(0, -1),
+          { role: 'user', content: question }
+        ]
+      }));
+    }
+  }, [question, selectedAgent]);
+
   // Auto-scroll to bottom when new messages are added
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -94,17 +115,6 @@ function App() {
     setLoadingQuery(true);
     setError("");
     
-    // Add user message immediately if not already added
-    if (!currentConversation.some(msg => msg.role === 'user' && msg.content === question)) {
-      setConversations(prev => ({
-        ...prev,
-        [selectedAgent.id]: [
-          ...(prev[selectedAgent.id] || []),
-          { role: 'user', content: question }
-        ]
-      }));
-    }
-    
     // Show typing indicator only when submitting
     setIsTyping(true);
     
@@ -148,14 +158,33 @@ function App() {
 
   const handleQuerySelect = (query) => {
     setQuestion(query);
-    // Add user message immediately
-    setConversations(prev => ({
-      ...prev,
-      [selectedAgent.id]: [
-        ...(prev[selectedAgent.id] || []),
-        { role: 'user', content: query }
-      ]
-    }));
+    // Add or update user message in conversation
+    setConversations(prev => {
+      const currentMessages = prev[selectedAgent.id] || [];
+      const lastMessage = currentMessages[currentMessages.length - 1];
+      
+      // If last message is from user and hasn't been responded to yet, update it
+      if (lastMessage && lastMessage.role === 'user' && 
+          (!currentMessages[currentMessages.length - 2] || 
+           currentMessages[currentMessages.length - 2].role === 'user')) {
+        return {
+          ...prev,
+          [selectedAgent.id]: [
+            ...currentMessages.slice(0, -1),
+            { role: 'user', content: query }
+          ]
+        };
+      }
+      
+      // Otherwise add new message
+      return {
+        ...prev,
+        [selectedAgent.id]: [
+          ...currentMessages,
+          { role: 'user', content: query }
+        ]
+      };
+    });
   };
 
   return (
@@ -222,7 +251,7 @@ function App() {
             </div>
 
             {/* Chat Section */}
-            <div className="flex-1 p-6 overflow-y-auto bg-neutral-50 pb-32">
+            <div className="flex-1 p-6 overflow-y-auto bg-neutral-50 pb-40">
               <div className="space-y-4">
                 {currentConversation.map((msg, index) => (
                   <div 
@@ -251,7 +280,7 @@ function App() {
                     <div className="whitespace-pre-wrap leading-relaxed text-neutral-700">{msg.content}</div>
                   </div>
                 ))}
-                {isTyping && (
+                {loadingQuery && (
                   <div className="ml-4 bg-white p-4 rounded-xl shadow-soft animate-fadeIn">
                     <div className="font-semibold mb-1 text-neutral-700">Assistant</div>
                     <TypingIndicator />
