@@ -7,18 +7,24 @@ const DefaultQueries = ({ queries, onQuerySelect, selectedAgent }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-2">
-        {queries.map((query, index) => (
-          <button
-            key={index}
-            onClick={() => onQuerySelect(query)}
-            className="text-sm px-4 py-3 rounded-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-soft active:scale-95 text-left bg-white border border-neutral-200 hover:border-primary-light hover:bg-primary-50"
-          >
+    <div className="space-y-3">
+      {queries.map((query, index) => (
+        <button
+          key={index}
+          onClick={() => onQuerySelect(query)}
+          className="w-full text-left p-4 rounded-xl bg-white border border-neutral-200 hover:border-primary-light hover:bg-primary-50 transition-all duration-200 shadow-soft hover:shadow-hover active:scale-95 animate-fadeInUp"
+          style={{
+            animationDelay: `${index * 50}ms`,
+            '--tw-translate-y': '0',
+            '--tw-scale-x': '1',
+            '--tw-scale-y': '1',
+          }}
+        >
+          <span className="text-neutral-700 hover:text-primary-dark transition-colors duration-200">
             {query}
-          </button>
-        ))}
-      </div>
+          </span>
+        </button>
+      ))}
     </div>
   );
 };

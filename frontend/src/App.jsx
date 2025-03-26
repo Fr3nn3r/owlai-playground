@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AgentSelector from "./components/AgentSelector";
 import QuestionInput from "./components/QuestionInput";
 import ResponseDisplay from "./components/ResponseDisplay";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorMessage from "./components/ErrorMessage";
 import DefaultQueries from "./components/DefaultQueries";
+import TypingIndicator from "./components/TypingIndicator";
 import config from "./config";
 
 function App() {
@@ -17,11 +18,22 @@ function App() {
   const [error, setError] = useState("");
   const [conversations, setConversations] = useState({});
   const [defaultQueries, setDefaultQueries] = useState([]);
+  const chatEndRef = useRef(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   const { API_URL } = config;
 
   // Get current conversation for selected agent
   const currentConversation = selectedAgent ? conversations[selectedAgent.id] || [] : [];
+
+  // Auto-scroll to bottom when new messages are added
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [currentConversation]);
 
   useEffect(() => {
     const AGENT_API_URL = `${API_URL}/agents`;
@@ -80,8 +92,22 @@ function App() {
     if (!question || !selectedAgent) return;
   
     setLoadingQuery(true);
-    setResponse("Loading...");
     setError("");
+    
+    // Add user message immediately if not already added
+    if (!currentConversation.some(msg => msg.role === 'user' && msg.content === question)) {
+      setConversations(prev => ({
+        ...prev,
+        [selectedAgent.id]: [
+          ...(prev[selectedAgent.id] || []),
+          { role: 'user', content: question }
+        ]
+      }));
+    }
+    
+    // Show typing indicator only when submitting
+    setIsTyping(true);
+    
     try {
       const res = await fetch(`${API_URL}/query`, {
         method: "POST",
@@ -93,30 +119,43 @@ function App() {
   
       if (!res.ok) throw new Error("Query failed.");
       const data = await res.json();
-      setResponse(data.answer);
       
-      // Add to conversation history for the current agent
+      // Add assistant response
       setConversations(prev => ({
         ...prev,
         [selectedAgent.id]: [
           ...(prev[selectedAgent.id] || []),
-          { role: 'user', content: question },
           { role: 'assistant', content: data.answer }
         ]
       }));
+      
       setQuestion(''); // Clear input after successful submission
     } catch (error) {
       console.error("Error querying agent:", error);
       setError("❌ Could not fetch agent response.");
-      setResponse("Something went wrong. Please try again.");
+      setConversations(prev => ({
+        ...prev,
+        [selectedAgent.id]: [
+          ...(prev[selectedAgent.id] || []),
+          { role: 'assistant', content: "Something went wrong. Please try again." }
+        ]
+      }));
     } finally {
       setLoadingQuery(false);
+      setIsTyping(false);
     }
   };
 
   const handleQuerySelect = (query) => {
     setQuestion(query);
-    handleSubmit();
+    // Add user message immediately
+    setConversations(prev => ({
+      ...prev,
+      [selectedAgent.id]: [
+        ...(prev[selectedAgent.id] || []),
+        { role: 'user', content: query }
+      ]
+    }));
   };
 
   return (
@@ -188,11 +227,16 @@ function App() {
                 {currentConversation.map((msg, index) => (
                   <div 
                     key={index} 
-                    className={`p-4 rounded-xl shadow-soft animate-fadeIn ${
+                    className={`p-4 rounded-xl shadow-soft animate-fadeInUp ${
                       msg.role === 'user' 
                         ? 'ml-4 bg-primary-50' 
                         : 'mr-4 bg-white'
                     }`}
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                      transform: 'scale(1)',
+                      opacity: 1,
+                    }}
                   >
                     <div 
                       className="font-semibold mb-1"
@@ -207,6 +251,13 @@ function App() {
                     <div className="whitespace-pre-wrap leading-relaxed text-neutral-700">{msg.content}</div>
                   </div>
                 ))}
+                {isTyping && (
+                  <div className="ml-4 bg-white p-4 rounded-xl shadow-soft animate-fadeIn">
+                    <div className="font-semibold mb-1 text-neutral-700">Assistant</div>
+                    <TypingIndicator />
+                  </div>
+                )}
+                <div ref={chatEndRef} />
               </div>
             </div>
 
