@@ -19,7 +19,10 @@ app = FastAPI()
 # Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Specifically allow your frontend origin
+    allow_origins=[
+        "http://localhost:5173",  # Development
+        "https://owlai-playground.vercel.app",  # Production
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
