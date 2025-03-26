@@ -65,17 +65,20 @@ const AgentSelector = ({ agents, selectedAgent, onSelect, className }) => {
               )}
             </div>
             <div className="flex-1">
+              <p 
+                className="text-sm font-medium px-3 py-1 rounded-full bg-primary/10 text-primary inline-block mb-3"
+                style={{
+                  border: '1px solid rgba(37, 99, 235, 0.2)',
+                }}
+              >
+                {agent.welcome_title}
+              </p>
               <h3 
                 className="text-lg font-semibold mb-2 tracking-tight text-neutral-800"
               >
                 {agent.name}
               </h3>
-              <p className="text-sm text-neutral-600 mb-2 leading-relaxed">{agent.description}</p>
-              <p 
-                className="text-sm italic text-neutral-500"
-              >
-                {agent.welcome_title}
-              </p>
+              <p className="text-sm text-neutral-600 leading-relaxed">{agent.description}</p>
             </div>
           </div>
         </div>
