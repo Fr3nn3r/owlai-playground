@@ -1,9 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from .data.agents import get_all_agents
 from typing import List, Dict
 import logging
 from pydantic import BaseModel
+import asyncio
+import json
 
 # from owlai.edwige import AgentManager
 
@@ -87,3 +90,37 @@ def query_agent(payload: QueryRequest):
         "question": payload.question,
         "answer": f"This is a mock answer to: '{payload.question}' from agent '{payload.agent_id}'.",
     }
+
+
+@app.post("/stream-query")
+async def stream_query(payload: QueryRequest):
+    # Verify agent exists
+    agents = get_all_agents()
+    agent = next((a for a in agents if a["id"] == payload.agent_id), None)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    async def generate():
+        # Simulate streaming response with multiple chunks
+        chunks = [
+            f"Processing your question: '{payload.question}'...\n",
+            "Analyzing the context...\n",
+            "Generating response...\n",
+            f"This is a mock streaming answer from agent '{payload.agent_id}'.\n",
+            "Finalizing response...\n",
+        ]
+
+        for chunk in chunks:
+            # Convert chunk to JSON format with SSE structure
+            yield f"data: {json.dumps({'content': chunk})}\n\n"
+            # Simulate processing time
+            await asyncio.sleep(1)
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
+    )

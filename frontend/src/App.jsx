@@ -187,6 +187,97 @@ function App() {
     });
   };
 
+  const handleStreamSubmit = async () => {
+    if (!question || !selectedAgent) return;
+  
+    setLoadingQuery(true);
+    setError("");
+    
+    // Show typing indicator only when submitting
+    setIsTyping(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/stream-query`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question, agent_id: selectedAgent.id }),
+      });
+
+      if (!response.ok) throw new Error("Stream query failed.");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let streamedResponse = "";
+
+      // Add user message to conversation
+      setConversations(prev => ({
+        ...prev,
+        [selectedAgent.id]: [
+          ...(prev[selectedAgent.id] || []),
+          { role: 'user', content: question }
+        ]
+      }));
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6));
+            streamedResponse += data.content;
+            
+            // Update conversation with streaming response
+            setConversations(prev => {
+              const currentMessages = prev[selectedAgent.id] || [];
+              const lastMessage = currentMessages[currentMessages.length - 1];
+              
+              if (lastMessage && lastMessage.role === 'assistant') {
+                // Update existing assistant message
+                return {
+                  ...prev,
+                  [selectedAgent.id]: [
+                    ...currentMessages.slice(0, -1),
+                    { role: 'assistant', content: streamedResponse }
+                  ]
+                };
+              } else {
+                // Add new assistant message
+                return {
+                  ...prev,
+                  [selectedAgent.id]: [
+                    ...currentMessages,
+                    { role: 'assistant', content: streamedResponse }
+                  ]
+                };
+              }
+            });
+          }
+        }
+      }
+      
+      setQuestion(''); // Clear input after successful submission
+    } catch (error) {
+      console.error("Error streaming agent response:", error);
+      setError("❌ Could not fetch agent response.");
+      setConversations(prev => ({
+        ...prev,
+        [selectedAgent.id]: [
+          ...(prev[selectedAgent.id] || []),
+          { role: 'assistant', content: "Something went wrong. Please try again." }
+        ]
+      }));
+    } finally {
+      setLoadingQuery(false);
+      setIsTyping(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white text-neutral-900">
       <div className="max-w-[1920px] mx-auto bg-white shadow-soft rounded-xl overflow-hidden animate-fadeInUp">
@@ -307,20 +398,36 @@ function App() {
                         }
                       }}
                     />
-                    <button
-                      onClick={handleSubmit}
-                      disabled={loadingQuery || !question || !selectedAgent}
-                      className="mt-2 px-6 py-3 rounded-xl w-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-primary hover:bg-primary-dark active:scale-95"
-                    >
-                      {loadingQuery ? (
-                        <div className="flex items-center justify-center space-x-2">
-                          <LoadingSpinner />
-                          <span>Thinking...</span>
-                        </div>
-                      ) : (
-                        "Ask Question"
-                      )}
-                    </button>
+                    <div className="flex space-x-2 mt-2">
+                      <button
+                        onClick={handleSubmit}
+                        disabled={loadingQuery || !question || !selectedAgent}
+                        className="flex-1 px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-primary hover:bg-primary-dark active:scale-95"
+                      >
+                        {loadingQuery ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <LoadingSpinner />
+                            <span>Thinking...</span>
+                          </div>
+                        ) : (
+                          "Ask Question"
+                        )}
+                      </button>
+                      <button
+                        onClick={handleStreamSubmit}
+                        disabled={loadingQuery || !question || !selectedAgent}
+                        className="flex-1 px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-secondary hover:bg-secondary-dark active:scale-95"
+                      >
+                        {loadingQuery ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <LoadingSpinner />
+                            <span>Streaming...</span>
+                          </div>
+                        ) : (
+                          "Test Stream"
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
