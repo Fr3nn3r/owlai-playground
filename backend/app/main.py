@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from .data.agents import get_all_agents
@@ -10,31 +10,73 @@ import json
 
 # from owlai.edwige import AgentManager
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging with more detail
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# Configure CORS middleware with more permissive settings
+# Configure CORS middleware with explicit origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins in production
+    allow_origins=["https://owlai-playground.vercel.app", "http://localhost:5173"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=3600,
 )
 
 
-# Add middleware to log requests
+# Add middleware to log requests with more detail
 @app.middleware("http")
 async def log_requests(request, call_next):
+    logger.info(f"Request received: {request.method} {request.url}")
+    logger.info(f"Request headers: {dict(request.headers)}")
     logger.info(f"Request from origin: {request.headers.get('origin')}")
-    response = await call_next(request)
-    logger.info(f"Response status: {response.status_code}")
-    return response
+
+    try:
+        response = await call_next(request)
+        logger.info(f"Response status: {response.status_code}")
+        logger.info(f"Response headers: {dict(response.headers)}")
+
+        # Add CORS headers explicitly for the production origin
+        if request.headers.get("origin") == "https://owlai-playground.vercel.app":
+            response.headers["Access-Control-Allow-Origin"] = (
+                "https://owlai-playground.vercel.app"
+            )
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            response.headers["Access-Control-Max-Age"] = "3600"
+
+        return response
+    except Exception as e:
+        logger.error(f"Error processing request: {str(e)}")
+        raise
+
+
+# Add specific error handler for CORS preflight
+@app.options("/{full_path:path}")
+async def options_handler(request):
+    logger.info(f"OPTIONS request received for path: {request.url.path}")
+    logger.info(f"OPTIONS headers: {dict(request.headers)}")
+
+    origin = request.headers.get("origin")
+    if origin == "https://owlai-playground.vercel.app":
+        return Response(
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "https://owlai-playground.vercel.app",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Max-Age": "3600",
+            },
+        )
+    return Response(status_code=403)
 
 
 # Initialize AgentManager
