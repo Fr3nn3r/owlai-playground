@@ -399,8 +399,8 @@ function App() {
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <img
                     src={selectedAgent.owl_image_url?.startsWith('/') 
-                      ? selectedAgent.owl_image_url 
-                      : `/${selectedAgent.owl_image_url || 'owl-default.jpg'}`
+                      ? selectedAgent.owl_image_url.replace(/^\/public/, '')
+                      : `/${selectedAgent.owl_image_url?.replace(/^public\//, '') || 'owl-default.jpg'}`
                     }
                     alt={`${selectedAgent.name} owl background`}
                     className="w-[90%] h-[90%] object-contain"
