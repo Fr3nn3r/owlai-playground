@@ -225,10 +225,8 @@ function App() {
       const currentMessages = prev[selectedAgent.id] || [];
       const lastMessage = currentMessages[currentMessages.length - 1];
       
-      // If last message is from user and hasn't been responded to yet, update it
-      if (lastMessage && lastMessage.role === 'user' && 
-          (!currentMessages[currentMessages.length - 2] || 
-           currentMessages[currentMessages.length - 2].role === 'user')) {
+      // If last message is from user, update it
+      if (lastMessage && lastMessage.role === 'user') {
         return {
           ...prev,
           [selectedAgent.id]: [
@@ -431,8 +429,8 @@ function App() {
                     key={index} 
                     className={`p-4 rounded-xl shadow-soft animate-fadeInUp ${
                       msg.role === 'user' 
-                        ? 'ml-4 bg-primary-50' 
-                        : 'mr-4 bg-white/90 backdrop-blur-sm'
+                        ? 'ml-4 bg-white border-2 border-primary/20 shadow-hover' 
+                        : 'mr-4 bg-white/70 backdrop-blur-sm border border-neutral-200'
                     }`}
                     style={{
                       animationDelay: `${index * 50}ms`,
@@ -441,20 +439,31 @@ function App() {
                     }}
                   >
                     <div 
-                      className="font-semibold mb-1"
+                      className="font-semibold mb-1 flex items-center gap-2"
                       style={{
                         color: msg.role === 'user' 
                           ? '#2563EB' 
                           : '#374151'
                       }}
                     >
-                      {msg.role === 'user' ? 'You' : selectedAgent?.name}
+                      {msg.role === 'user' ? (
+                        <>
+                          <span className="text-primary">You</span>
+                          <span className="text-xs bg-primary/10 px-2 py-0.5 rounded-full">Question</span>
+                        </>
+                      ) : (
+                        selectedAgent?.name
+                      )}
                     </div>
-                    <div className="whitespace-pre-wrap leading-relaxed text-neutral-700">{msg.content}</div>
+                    <div className={`whitespace-pre-wrap leading-relaxed ${
+                      msg.role === 'user' 
+                        ? 'text-neutral-900 font-medium' 
+                        : 'text-neutral-700'
+                    }`}>{msg.content}</div>
                   </div>
                 ))}
                 {isTyping && (
-                  <div className="ml-4 bg-white p-4 rounded-xl shadow-soft animate-fadeIn">
+                  <div className="ml-4 bg-white/70 p-4 rounded-xl shadow-soft animate-fadeIn border border-neutral-200">
                     <div className="font-semibold mb-1 text-neutral-700">{selectedAgent?.name}</div>
                     <TypingIndicator />
                   </div>
