@@ -398,7 +398,10 @@ function App() {
               {selectedAgent && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <img
-                    src={selectedAgent.owl_image_url || '/owl-default.jpg'}
+                    src={selectedAgent.owl_image_url?.startsWith('/') 
+                      ? selectedAgent.owl_image_url 
+                      : `/${selectedAgent.owl_image_url || 'owl-default.jpg'}`
+                    }
                     alt={`${selectedAgent.name} owl background`}
                     className="w-[90%] h-[90%] object-contain"
                     onError={(e) => {

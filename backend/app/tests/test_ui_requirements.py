@@ -18,7 +18,7 @@ def test_agent_selection_response():
         assert "primary" in agent["color_theme"]
         assert "secondary" in agent["color_theme"]
         assert "owl_image_url" in agent
-        assert agent["owl_image_url"].startswith("http")  # Ensure it's a valid URL
+        assert agent["owl_image_url"].startswith("/")  # Ensure it's a relative path
         assert "welcome_title" in agent
         assert len(agent["welcome_title"]) > 0
 
