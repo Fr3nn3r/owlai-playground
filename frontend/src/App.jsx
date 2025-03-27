@@ -392,9 +392,9 @@ function App() {
 
           {/* Right Column - Chat Area (55%) - Scrollable */}
           <div className="lg:w-55 flex flex-col flex-1 relative">
-            {/* Chat Section with Background Owl - Scrollable */}
-            <div className="flex-1 p-6 overflow-y-auto bg-neutral-50 relative">
-              {/* Background Owl */}
+            {/* Fixed Background Container */}
+            <div className="absolute inset-0 bg-neutral-50">
+              {/* Background Owl - Fixed */}
               {selectedAgent && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <img
@@ -414,7 +414,10 @@ function App() {
                   />
                 </div>
               )}
-              
+            </div>
+
+            {/* Scrollable Chat Container */}
+            <div className="relative flex-1 overflow-y-auto">
               {/* Loading Overlay */}
               {loadingQuery && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-10">
@@ -423,7 +426,7 @@ function App() {
               )}
 
               {/* Chat Messages */}
-              <div className="space-y-4 relative z-20 pb-40 chat-messages-container">
+              <div className="p-6 space-y-4 relative z-20 pb-40 chat-messages-container">
                 {currentConversation.map((msg, index) => (
                   <div 
                     key={index} 
