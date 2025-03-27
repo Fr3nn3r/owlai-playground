@@ -11,16 +11,6 @@ export default defineConfig({
   publicDir: 'public',
   build: {
     // Ensure assets are copied to the correct location
-    assetsDir: 'assets',
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          // Keep original filenames for images
-          if (assetInfo.name.match(/\.(jpg|jpeg|png|gif|svg)$/)) {
-            return `assets/[name][extname]`;
-          }
-        }
-      }
-    }
+    assetsDir: 'assets'
   }
 })
