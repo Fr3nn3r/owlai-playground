@@ -11,12 +11,21 @@ const AgentSelector = ({ agents, selectedAgent, onSelect, className }) => {
     return null;
   }
 
-  const handleImageError = (agentId) => {
+  const handleImageError = (agentId, imageUrl) => {
+    console.error(`Failed to load image for agent ${agentId}:`, {
+      attemptedUrl: imageUrl,
+      fallbackUrl: DEFAULT_OWL_IMAGE,
+      timestamp: new Date().toISOString()
+    });
     setFailedImages(prev => new Set([...prev, agentId]));
   };
 
   const getImageUrl = (agent) => {
     if (failedImages.has(agent.id) || !agent.owl_image_url) {
+      console.warn(`Using default image for agent ${agent.id}:`, {
+        originalUrl: agent.owl_image_url,
+        fallbackUrl: DEFAULT_OWL_IMAGE
+      });
       return DEFAULT_OWL_IMAGE;
     }
     return agent.owl_image_url;
@@ -52,7 +61,7 @@ const AgentSelector = ({ agents, selectedAgent, onSelect, className }) => {
                 src={getImageUrl(agent)}
                 alt={`${agent.name} owl avatar`}
                 className="w-16 h-16 rounded-full object-cover shadow-soft transition-transform duration-300 hover:scale-110"
-                onError={() => handleImageError(agent.id)}
+                onError={() => handleImageError(agent.id, agent.owl_image_url)}
                 loading="lazy"
               />
               {failedImages.has(agent.id) && (
