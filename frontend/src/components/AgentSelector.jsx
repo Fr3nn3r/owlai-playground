@@ -28,10 +28,10 @@ const AgentSelector = ({ agents, selectedAgent, onSelect, className }) => {
       });
       return DEFAULT_OWL_IMAGE;
     }
-    // Ensure the URL starts with a forward slash
+    // Ensure the URL starts with a forward slash and remove any 'public' prefix
     const imageUrl = agent.owl_image_url.startsWith('/') 
-      ? agent.owl_image_url 
-      : `/${agent.owl_image_url}`;
+      ? agent.owl_image_url.replace(/^\/public/, '')
+      : `/${agent.owl_image_url.replace(/^public\//, '')}`;
     return imageUrl;
   };
 
