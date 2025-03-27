@@ -377,15 +377,17 @@ function App() {
           </div>
 
           {/* Middle Column - Default Questions (20%) - Fixed */}
-          <div className="lg:w-20 p-6 border-b lg:border-b-0 lg:border-r border-neutral-200">
+          <div className="lg:w-20 p-6 border-b lg:border-b-0 lg:border-r border-neutral-200 flex flex-col">
             {selectedAgent && (
-              <div className="space-y-6">
+              <div className="space-y-6 flex flex-col h-full">
                 <h3 className="text-xl font-semibold tracking-tight text-neutral-800">Suggested Questions</h3>
-                <DefaultQueries 
-                  queries={defaultQueries}
-                  onQuerySelect={handleQuerySelect}
-                  selectedAgent={selectedAgent}
-                />
+                <div className="flex-1 overflow-y-auto">
+                  <DefaultQueries 
+                    queries={defaultQueries}
+                    onQuerySelect={handleQuerySelect}
+                    selectedAgent={selectedAgent}
+                  />
+                </div>
               </div>
             )}
           </div>
