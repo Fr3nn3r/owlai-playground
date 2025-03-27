@@ -433,7 +433,7 @@ function App() {
                     className={`p-4 rounded-xl shadow-soft animate-fadeInUp ${
                       msg.role === 'user' 
                         ? 'ml-4 bg-white border-2 border-primary/20 shadow-hover' 
-                        : 'mr-4 bg-white/70 backdrop-blur-sm border border-neutral-200'
+                        : 'mr-4 bg-white/90 backdrop-blur-sm border border-neutral-200'
                     }`}
                     style={{
                       animationDelay: `${index * 50}ms`,
@@ -461,7 +461,7 @@ function App() {
                     <div className={`whitespace-pre-wrap leading-relaxed ${
                       msg.role === 'user' 
                         ? 'text-neutral-900 font-medium' 
-                        : 'text-neutral-700'
+                        : 'text-neutral-800'
                     }`}>{msg.content}</div>
                   </div>
                 ))}
@@ -482,32 +482,36 @@ function App() {
           <div className="max-w-[1920px] mx-auto">
             <div className="lg:ml-[45%] p-4">
               <div className="max-w-3xl">
-                <QuestionInput 
-                  question={question} 
-                  setQuestion={setQuestion}
-                  onSubmit={handleSubmit}
-                  style={{
-                    borderColor: '#E5E7EB',
-                    '&:focus': {
-                      borderColor: '#2563EB',
-                      boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.1)',
-                    }
-                  }}
-                />
-                <button
-                  onClick={handleSubmit}
-                  disabled={loadingQuery || !question || !selectedAgent}
-                  className="mt-2 px-6 py-3 rounded-xl w-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-primary hover:bg-primary-dark active:scale-95"
-                >
-                  {loadingQuery ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <LoadingSpinner />
-                      <span>Thinking...</span>
-                    </div>
-                  ) : (
-                    "Ask Question"
-                  )}
-                </button>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <QuestionInput 
+                      question={question} 
+                      setQuestion={setQuestion}
+                      onSubmit={handleSubmit}
+                      style={{
+                        borderColor: '#E5E7EB',
+                        '&:focus': {
+                          borderColor: '#2563EB',
+                          boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.1)',
+                        }
+                      }}
+                    />
+                  </div>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={loadingQuery || !question || !selectedAgent}
+                    className="px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-primary hover:bg-primary-dark active:scale-95 whitespace-nowrap"
+                  >
+                    {loadingQuery ? (
+                      <div className="flex items-center justify-center space-x-2">
+                        <LoadingSpinner />
+                        <span>Thinking...</span>
+                      </div>
+                    ) : (
+                      "Ask Question"
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
