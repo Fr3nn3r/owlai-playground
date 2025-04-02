@@ -295,3 +295,56 @@ async def get_query_logs(query_id: str):
 async def get_version():
     """Get the current version of OwlAI."""
     return {"version": "0.2.0"}
+
+
+@app.get("/feedback/all")
+async def get_all_feedback():
+    """Get all feedback entries with associated query information."""
+    # Mock feedback data for demonstration
+    mock_feedback = [
+        {
+            "query_id": "agent1-1",
+            "agent_id": "agent1",
+            "rating": 5,
+            "comment": "Very helpful and accurate response!",
+            "timestamp": "2024-04-02T10:00:00Z",
+            "query": "Can you explain what constitutes a valid civil contract in French law?",
+            "response": "A valid civil contract in French law requires four essential elements: consent (consentement), capacity (capacité), a defined object (objet), and a lawful cause (cause licite). The parties must give their free and informed consent, be legally capable of entering into contracts, agree on a specific and legal purpose, and have a legitimate reason for the contract. Additionally, certain contracts may require specific formalities, such as being in writing or notarized.",
+        },
+        {
+            "query_id": "agent2-1",
+            "agent_id": "agent2",
+            "rating": 2,
+            "comment": "The response was a bit confusing and could be more detailed.",
+            "timestamp": "2024-04-02T09:45:00Z",
+            "query": "What are the main elements of criminal liability in French law?",
+            "response": "Criminal liability in French law involves several elements. There needs to be a legal text defining the offense, and the person must have committed the act intentionally or through negligence.",
+        },
+        {
+            "query_id": "agent1-2",
+            "agent_id": "agent1",
+            "rating": 4,
+            "timestamp": "2024-04-02T09:30:00Z",
+            "query": "What are the basic property rights under French civil law?",
+            "response": "Under French civil law, property rights (droits réels) include: the right to use (usus), the right to enjoy benefits (fructus), and the right to dispose of property (abusus). These rights are protected by the Civil Code and can only be limited by law or contract. Property owners have extensive rights but must exercise them within legal boundaries and respect neighbors' rights.",
+        },
+        {
+            "query_id": "agent3-1",
+            "agent_id": "agent3",
+            "rating": 5,
+            "comment": "Perfect explanation, exactly what I needed!",
+            "timestamp": "2024-04-02T09:15:00Z",
+            "query": "What is the process for filing an administrative appeal?",
+            "response": "To file an administrative appeal in France, you must first identify whether you need a recours gracieux (appeal to the same authority) or recours hiérarchique (appeal to a higher authority). The appeal must be filed within 2 months of the decision. Include all relevant documents, clearly state your arguments, and keep proof of submission. The administration then has 2 months to respond, and silence is considered a rejection.",
+        },
+        {
+            "query_id": "agent2-2",
+            "agent_id": "agent2",
+            "rating": 1,
+            "comment": "The answer was not relevant to my question.",
+            "timestamp": "2024-04-02T09:00:00Z",
+            "query": "What constitutes legitimate self-defense under French penal law?",
+            "response": "Self-defense in French law requires proportionality between the threat and the response. The danger must be immediate and the response necessary.",
+        },
+    ]
+    return mock_feedback
