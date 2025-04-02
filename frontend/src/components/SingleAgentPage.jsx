@@ -165,12 +165,26 @@ function SingleAgentPage() {
   if (!agent) return <ErrorMessage message="Aucun agent disponible" />;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 relative">
+      {/* Single owl background for entire page */}
+      <div 
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'url("/owl-default.jpg")',
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.9,
+          zIndex: 0
+        }}
+      />
+
+      {/* Main content container */}
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left panel - Suggested queries */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
+            <div className="bg-white/60 rounded-lg shadow-sm p-6 sticky top-4">
               <h2 className="text-lg font-semibold mb-4 text-gray-700">Questions Suggérées</h2>
               <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
                 <DefaultQueries
@@ -187,61 +201,65 @@ function SingleAgentPage() {
 
           {/* Main content area */}
           <div className="lg:col-span-6">
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
-              <p className="text-gray-600 mb-6">{agent?.description}</p>
-              
-              <QuestionInput
-                value={question}
-                onChange={setQuestion}
-                onSubmit={handleSubmit}
-                placeholder="Posez votre question..."
-                disabled={loadingQuery}
-              />
+            <div className="bg-white/60 rounded-lg shadow-sm p-6 mb-6 min-h-[600px]">
+              <div className="relative z-10">
+                <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
+                <p className="text-gray-600 mb-6">{agent?.description}</p>
+                
+                <QuestionInput
+                  value={question}
+                  onChange={setQuestion}
+                  onSubmit={handleSubmit}
+                  placeholder="Posez votre question..."
+                  disabled={loadingQuery}
+                />
 
-              {loadingQuery && !response && (
-                <div className="flex justify-center my-8">
-                  <LoadingSpinner />
-                </div>
-              )}
-
-              {error && (
-                <div className="text-red-500 my-4">
-                  {error === "Échec de la réponse. Veuillez réessayer." 
-                    ? "Échec de la réponse. Veuillez réessayer."
-                    : error}
-                </div>
-              )}
-
-              {response && (
-                <div className="mt-6">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="whitespace-pre-wrap">{response}</p>
+                {loadingQuery && !response && (
+                  <div className="flex justify-center my-8">
+                    <LoadingSpinner />
                   </div>
-                  {isTyping && <TypingIndicator />}
-                  <div className="mt-4">
-                    <FeedbackComponent
-                      queryId={conversations[conversations.length - 1]?.id}
-                      agentId={agent?.id}
-                    />
+                )}
+
+                {error && (
+                  <div className="text-red-500 my-4">
+                    {error === "Échec de la réponse. Veuillez réessayer." 
+                      ? "Échec de la réponse. Veuillez réessayer."
+                      : error}
                   </div>
-                </div>
-              )}
+                )}
+
+                {response && (
+                  <div className="mt-6">
+                    <div className="bg-gray-50/60 rounded-lg p-4">
+                      <p className="whitespace-pre-wrap">{response}</p>
+                    </div>
+                    {isTyping && <TypingIndicator />}
+                    <div className="mt-4">
+                      <FeedbackComponent
+                        queryId={conversations[conversations.length - 1]?.id}
+                        agentId={agent?.id}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Previous conversations */}
             <div className="space-y-4">
               {conversations.slice(0, -1).reverse().map((conv) => (
-                <div key={conv.id} className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="font-medium mb-2">{conv.question}</div>
-                  <div className="text-gray-700 whitespace-pre-wrap">
-                    {conv.answer}
-                  </div>
-                  <div className="mt-4">
-                    <FeedbackComponent
-                      queryId={conv.id}
-                      agentId={agent?.id}
-                    />
+                <div key={conv.id} className="bg-white/60 rounded-lg shadow-sm p-6">
+                  <div className="relative z-10">
+                    <div className="font-medium mb-2">{conv.question}</div>
+                    <div className="text-gray-700 whitespace-pre-wrap">
+                      {conv.answer}
+                    </div>
+                    <div className="mt-4">
+                      <FeedbackComponent
+                        queryId={conv.id}
+                        agentId={agent?.id}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
@@ -250,7 +268,7 @@ function SingleAgentPage() {
 
           {/* Right panel - Document chunks */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
+            <div className="bg-white/60 rounded-lg shadow-sm p-6 sticky top-4">
               <ChunkViewer
                 chunks={chunks}
                 isLoading={loadingChunks}
