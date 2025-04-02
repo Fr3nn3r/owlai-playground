@@ -178,3 +178,113 @@ async def stream_query(payload: QueryRequest):
             "Connection": "keep-alive",
         },
     )
+
+
+# Additional models for new features
+class FeedbackRequest(BaseModel):
+    agent_id: str
+    query_id: str
+    rating: int  # 1 for positive, 0 for negative
+    comment: str | None = None
+
+
+class ContactFormRequest(BaseModel):
+    name: str
+    email: str
+    message: str
+
+
+class DocumentChunk(BaseModel):
+    id: str
+    content: str
+    relevance_score: float
+    source: str
+
+
+# New endpoints for single agent page
+@app.get("/default-agent")
+def get_default_agent():
+    """Get the default agent for the single-agent page."""
+    agents = get_all_agents()
+    if not agents:
+        raise HTTPException(status_code=404, detail="No agents available")
+    return agents[0]
+
+
+# Feedback system endpoints
+@app.post("/feedback")
+async def submit_feedback(feedback: FeedbackRequest):
+    """Submit feedback for a specific query response."""
+    logger.info(
+        f"Received feedback for query {feedback.query_id}: rating={feedback.rating}, comment={feedback.comment}"
+    )
+    return {"status": "success", "message": "Feedback recorded"}
+
+
+@app.post("/contact")
+async def submit_contact_form(contact: ContactFormRequest):
+    """Submit contact form feedback."""
+    logger.info(f"Received contact form submission from {contact.email}")
+    return {"status": "success", "message": "Contact form submitted"}
+
+
+# Document chunks visualization endpoint
+@app.get("/query/{query_id}/chunks")
+async def get_query_chunks(query_id: str):
+    """Get document chunks used to answer a specific query."""
+    # Mock response with sample chunks
+    chunks = [
+        DocumentChunk(
+            id="1",
+            content="This is a relevant document chunk...",
+            relevance_score=0.95,
+            source="document1.pdf",
+        ),
+        DocumentChunk(
+            id="2",
+            content="Another relevant piece of information...",
+            relevance_score=0.85,
+            source="document2.pdf",
+        ),
+    ]
+    return chunks
+
+
+# Enhanced logging endpoint
+@app.get("/query/{query_id}/logs")
+async def get_query_logs(query_id: str):
+    """Get detailed logs for a specific query (for development purposes)."""
+    # Mock response with sample logs
+    logs = {
+        "query_id": query_id,
+        "timestamp": "2024-04-02T10:00:00Z",
+        "processing_time": 1.5,
+        "llm_interactions": [
+            {
+                "timestamp": "2024-04-02T10:00:00Z",
+                "type": "prompt",
+                "content": "Sample prompt content",
+            },
+            {
+                "timestamp": "2024-04-02T10:00:01Z",
+                "type": "response",
+                "content": "Sample response content",
+            },
+        ],
+        "tool_invocations": [
+            {
+                "timestamp": "2024-04-02T10:00:00.5Z",
+                "tool": "document_search",
+                "parameters": {"query": "sample search"},
+                "result": "sample result",
+            }
+        ],
+    }
+    return logs
+
+
+# Version endpoint
+@app.get("/version")
+async def get_version():
+    """Get the current version of OwlAI."""
+    return {"version": "0.2.0"}

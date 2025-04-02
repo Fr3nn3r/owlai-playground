@@ -1,0 +1,78 @@
+### Product Requirements Document (PRD)
+
+#### Project Overview
+The OwlAI playground is being incrementally enhanced. The new focus includes minimal modifications to the existing main page, the addition of a specialized single-agent page, integration of feedback systems, chunk visualization, social media sharing, and improved logging.
+
+#### User Stories and Acceptance Criteria
+
+1. **Minimal Main Page Changes**
+   - Retain the existing layout, functionalities, and design.
+   - Confirm no disruptions to previous functionality.
+
+2. **Dedicated Single-Agent Page**
+   - Duplicate existing playground page and modify for a single main agent.
+   - Clearly distinguish this page from other functionality.
+
+3. **Feedback Mechanism for Answers**
+   - Enable users to submit feedback (positive/negative, comments) on LLM-generated answers.
+   - Feedback must directly correlate with queries and agent responses.
+
+4. **Document Chunks Visualization**
+   - Display selected document chunks tied to user queries.
+   - Implement interactive highlighting to enhance relevance visibility.
+
+5. **Social Media Integration**
+   - Add intuitive sharing buttons for Twitter, LinkedIn, Facebook, etc.
+   - Provide shareable links with optimized metadata.
+
+6. **User Feedback Contact Form**
+   - Easy-to-use contact form for users to directly provide feedback.
+   - Secure, organized collection and management of feedback.
+
+7. **Floating Top Section**
+   - Create a floating top navigation bar inspired by the relevanceai.com site.
+
+8. **Enhanced Developer Logging**
+   - Structured logging of LLM interactions and tool invocations.
+   - Linking of logged interactions explicitly with user feedback.
+
+9. **OwlAI Version Visibility**
+   - Clearly display OwlAI version number on the interface.
+
+#### Technical Considerations
+- PostgreSQL will be used for logging and feedback data.
+- Ensure frontend modifications are modular and maintainable.
+- Maintain cross-browser compatibility and mobile responsiveness.
+
+---
+
+### Agile Product Backlog
+
+**Sprint 1: Infrastructure and Logging Setup**
+- Duplicate the existing playground page for single-agent use.
+- Mock Server Endpoint Creation
+
+**Sprint 2: Feedback and Interaction**
+- Integrate user feedback functionality on agent responses.
+- Link feedback directly to logged interactions.
+- Create and deploy user feedback contact form.
+
+**Sprint 3: Visualization and Versioning**
+- Develop visualization tools for query-related document chunks.
+- Display OwlAI version number clearly on UI.
+
+**Sprint 4: Social Sharing and UI Enhancements**
+- Implement social media sharing functionality.
+- Develop floating top navigation bar.
+
+**Sprint 5: QA and Deployment**
+- Conduct thorough QA testing.
+- Deploy incremental updates.
+- Monitor user feedback and interactions for iterative improvements.
+
+
+
+# Project structure
+- backend: all backend files and mock server
+- frontend: all frontend files
+
