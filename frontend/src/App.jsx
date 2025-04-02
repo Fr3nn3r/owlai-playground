@@ -14,30 +14,33 @@ import config from "./config";
 function App() {
   return (
     <Router>
-      <div>
-        {/* Floating top navigation */}
-        <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-8">
-                <Link to="/" className="text-xl font-bold text-gray-800">
-                  OwlAI Playground
-                </Link>
-                <Link to="/single-agent" className="text-gray-600 hover:text-gray-800">
-                  Single Agent
-                </Link>
-              </div>
-            </div>
-          </div>
-        </nav>
+      {/* Floating top navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-sm z-50">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          {/* Left side - OwlAI title */}
+          <Link 
+            to="/single-agent" 
+            className="text-xl font-semibold text-gray-800 hover:text-primary transition-colors"
+          >
+            OwlAI
+          </Link>
 
-        {/* Main content with top padding for the fixed nav */}
-        <div className="pt-16">
-          <Routes>
-            <Route path="/" element={<Playground />} />
-            <Route path="/single-agent" element={<SingleAgentPage />} />
-          </Routes>
+          {/* Right side - Version 0.1.0 link */}
+          <Link 
+            to="/" 
+            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            version 0.1.0
+          </Link>
         </div>
+      </nav>
+
+      {/* Content with top padding for the fixed nav */}
+      <div className="pt-16">
+        <Routes>
+          <Route path="/" element={<Playground />} />
+          <Route path="/single-agent" element={<SingleAgentPage />} />
+        </Routes>
       </div>
     </Router>
   );

@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from .data.agents import get_all_agents
-from typing import List, Dict
+from typing import List, Dict, Optional
 import logging
 from pydantic import BaseModel
 import asyncio
@@ -182,10 +182,10 @@ async def stream_query(payload: QueryRequest):
 
 # Additional models for new features
 class FeedbackRequest(BaseModel):
-    agent_id: str
     query_id: str
-    rating: int  # 1 for positive, 0 for negative
-    comment: str | None = None
+    agent_id: str
+    rating: int
+    comment: Optional[str] = None
 
 
 class ContactFormRequest(BaseModel):
@@ -214,11 +214,18 @@ def get_default_agent():
 # Feedback system endpoints
 @app.post("/feedback")
 async def submit_feedback(feedback: FeedbackRequest):
-    """Submit feedback for a specific query response."""
-    logger.info(
-        f"Received feedback for query {feedback.query_id}: rating={feedback.rating}, comment={feedback.comment}"
-    )
-    return {"status": "success", "message": "Feedback recorded"}
+    """
+    Submit feedback for a query response.
+    Rating should be between 1 and 5.
+    """
+    if not 1 <= feedback.rating <= 5:
+        raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
+
+    # In a real implementation, this would store the feedback in a database
+    # For now, we'll just log it
+    print(f"Received feedback: {feedback.dict()}")
+
+    return {"status": "success", "message": "Feedback received"}
 
 
 @app.post("/contact")

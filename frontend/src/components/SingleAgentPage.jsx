@@ -5,6 +5,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
 import DefaultQueries from "./DefaultQueries";
 import TypingIndicator from "./TypingIndicator";
+import FeedbackComponent from "./FeedbackComponent";
 import config from "../config";
 
 function SingleAgentPage() {
@@ -30,12 +31,7 @@ function SingleAgentPage() {
         if (!response.ok) throw new Error("Failed to fetch default agent");
         const data = await response.json();
         setAgent(data);
-        
-        // Fetch default queries for the agent
-        const queriesResponse = await fetch(`${API_URL}/agents/${data.id}/default-queries`);
-        if (!queriesResponse.ok) throw new Error("Failed to fetch default queries");
-        const queries = await queriesResponse.json();
-        setDefaultQueries(queries);
+        setDefaultQueries(data.default_queries);
       } catch (err) {
         console.error("Failed to fetch agent data:", err);
         setError("Could not load the agent. Please try again later.");
@@ -152,51 +148,73 @@ function SingleAgentPage() {
         <p className="text-gray-600">{agent.description}</p>
       </div>
 
-      {/* Chat interface */}
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          {/* Conversation history */}
-          <div className="mb-6 max-h-[500px] overflow-y-auto chat-messages-container">
-            {conversations.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`mb-4 ${
-                  msg.role === 'user' ? 'text-right' : 'text-left'
-                }`}
-              >
-                <div
-                  className={`inline-block p-3 rounded-lg ${
-                    msg.role === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  {msg.content}
-                </div>
-              </div>
-            ))}
-            {isTyping && <TypingIndicator />}
-            <div ref={chatEndRef} />
+      {/* Two-column layout */}
+      <div className="flex gap-6">
+        {/* Left column - Default queries */}
+        <div className="w-1/4 min-w-[250px]">
+          <div className="bg-white rounded-lg shadow-lg p-4">
+            <h2 className="text-lg font-semibold mb-4 text-gray-700">Suggested Questions</h2>
+            <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
+              <DefaultQueries
+                queries={defaultQueries}
+                onQuerySelect={query => {
+                  setQuestion(query);
+                  handleSubmit();
+                }}
+                selectedAgent={agent}
+              />
+            </div>
           </div>
-
-          {/* Question input */}
-          <QuestionInput
-            value={question}
-            onChange={setQuestion}
-            onSubmit={handleSubmit}
-            disabled={loadingQuery}
-            placeholder="Ask your question..."
-          />
         </div>
 
-        {/* Default queries */}
-        <DefaultQueries
-          queries={defaultQueries}
-          onSelectQuery={query => {
-            setQuestion(query);
-            handleSubmit();
-          }}
-        />
+        {/* Right column - Chat interface */}
+        <div className="flex-1">
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+            {/* Conversation history */}
+            <div className="mb-6 max-h-[calc(100vh-300px)] overflow-y-auto chat-messages-container">
+              {conversations.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`mb-4 ${
+                    msg.role === 'user' ? 'text-right' : 'text-left'
+                  }`}
+                >
+                  <div
+                    className={`inline-block p-3 rounded-lg ${
+                      msg.role === 'user'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                  {msg.role === 'assistant' && (
+                    <div className="mt-2">
+                      <FeedbackComponent
+                        queryId={`${agent.id}-${idx}`}
+                        agentId={agent.id}
+                        onFeedbackSubmitted={() => {
+                          console.log('Feedback submitted for message:', idx);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+              {isTyping && <TypingIndicator />}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Question input */}
+            <QuestionInput
+              value={question}
+              onChange={setQuestion}
+              onSubmit={handleSubmit}
+              disabled={loadingQuery}
+              placeholder="Ask your question..."
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

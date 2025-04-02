@@ -6,6 +6,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
 import DefaultQueries from "./DefaultQueries";
 import TypingIndicator from "./TypingIndicator";
+import FeedbackComponent from "./FeedbackComponent";
 import config from "../config";
 
 function Playground() {
@@ -345,6 +346,15 @@ function Playground() {
                         ? 'text-neutral-900 font-medium' 
                         : 'text-neutral-800'
                     }`}>{msg.content}</div>
+                    {msg.role === 'assistant' && (
+                      <FeedbackComponent
+                        queryId={`${selectedAgent.id}-${index}`}
+                        agentId={selectedAgent.id}
+                        onFeedbackSubmitted={() => {
+                          console.log('Feedback submitted for message:', index);
+                        }}
+                      />
+                    )}
                   </div>
                 ))}
                 {isTyping && (
