@@ -22,6 +22,7 @@ function SingleAgentPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [version, setVersion] = useState(null);
   const chatEndRef = useRef(null);
+  const latestConversationRef = useRef(null);
 
   const { API_URL } = config;
 
@@ -63,6 +64,30 @@ function SingleAgentPage() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversations]);
 
+  // Scroll to the latest conversation when it's added
+  useEffect(() => {
+    if (latestConversationRef.current) {
+      const yOffset = -100; // Offset to account for the fixed header
+      const element = latestConversationRef.current;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      
+      window.scrollTo({
+        top: y,
+        behavior: 'smooth'
+      });
+    }
+  }, [conversations.length]); // Only run when new conversations are added
+
+  // Scroll to follow the streaming response
+  useEffect(() => {
+    if (latestConversationRef.current && loadingQuery) {
+      latestConversationRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'end'
+      });
+    }
+  }, [response, loadingQuery]); // Run when response updates during streaming
+
   const handleSubmit = async () => {
     if (!question.trim()) return;
     
@@ -87,6 +112,16 @@ function SingleAgentPage() {
         console.log('💬 Current conversations:', newConv);
         return newConv;
       });
+
+      // Initial scroll to the new conversation
+      setTimeout(() => {
+        if (latestConversationRef.current) {
+          latestConversationRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      }, 100);
 
       console.log('🌐 Making API request to:', `${API_URL}/stream-query`);
       const response = await fetch(`${API_URL}/stream-query`, {
@@ -196,7 +231,7 @@ function SingleAgentPage() {
 
       {/* Main content container */}
       <div className="container mx-auto px-4 py-8 relative z-10 pb-32">
-        <div className="grid grid-cols-1 lg:grid-cols-9 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left panel - Suggested queries */}
           <div className="lg:col-span-3">
             <div className="bg-white/60 rounded-lg shadow-sm p-6 sticky top-4">
@@ -211,7 +246,7 @@ function SingleAgentPage() {
             </div>
           </div>
 
-          {/* Main content area - now wider */}
+          {/* Main content area - center */}
           <div className="lg:col-span-6">
             <div className="bg-white/60 rounded-lg shadow-sm p-6 mb-6">
               <div className="relative z-10">
@@ -223,7 +258,11 @@ function SingleAgentPage() {
                   {conversations.length > 0 && (
                     console.log('🎯 Rendering conversations:', conversations),
                     conversations.map((conv, index) => (
-                      <div key={conv.id} className="bg-white/60 rounded-lg shadow-sm p-4">
+                      <div 
+                        key={conv.id} 
+                        className="bg-white/60 rounded-lg shadow-sm p-4"
+                        ref={index === conversations.length - 1 ? latestConversationRef : null}
+                      >
                         <div className="font-medium mb-2">
                           {console.log('📄 Rendering question:', conv.question)}
                           {conv.question}
@@ -269,13 +308,43 @@ function SingleAgentPage() {
               />
             )}
           </div>
+
+          {/* Right panel - Document chunks */}
+          <div className="lg:col-span-3">
+            <div className="bg-white/60 rounded-lg shadow-sm p-6 sticky top-4">
+              <h2 className="text-lg font-semibold mb-4 text-gray-700">Sources</h2>
+              <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
+                {loadingQuery ? (
+                  <div className="flex justify-center py-8">
+                    <LoadingSpinner />
+                  </div>
+                ) : conversations.length > 0 && conversations[conversations.length - 1].answer ? (
+                  <div className="space-y-4">
+                    {/* Example chunks - replace with actual data */}
+                    <div className="p-4 rounded-lg bg-white/80 border border-gray-200">
+                      <div className="text-sm text-gray-600 mb-2">Source 1</div>
+                      <p className="text-sm text-gray-800">Relevant content from the document...</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-white/80 border border-gray-200">
+                      <div className="text-sm text-gray-600 mb-2">Source 2</div>
+                      <p className="text-sm text-gray-800">Additional context from another source...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-gray-500 text-sm">
+                    Les sources pertinentes apparaîtront ici une fois que vous aurez posé une question.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Floating input area */}
       <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-lg">
-          <div className="container mx-auto px-4 py-4">
+        <div className="py-4">
+          <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="flex gap-4 items-center">
                 <div className="flex-1">
@@ -288,14 +357,14 @@ function SingleAgentPage() {
                     style={{
                       backgroundColor: 'white',
                       borderColor: '#E5E7EB',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                     }}
                   />
                 </div>
                 <button
                   onClick={handleSubmit}
                   disabled={loadingQuery || !question.trim()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap h-[60px] flex items-center justify-center gap-2"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap h-[60px] flex items-center justify-center gap-2"
                 >
                   {loadingQuery ? (
                     <>
