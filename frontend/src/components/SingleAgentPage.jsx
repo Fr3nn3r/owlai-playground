@@ -195,7 +195,7 @@ function SingleAgentPage() {
       />
 
       {/* Main content container */}
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="container mx-auto px-4 py-8 relative z-10 pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-9 gap-8">
           {/* Left panel - Suggested queries */}
           <div className="lg:col-span-3">
@@ -213,18 +213,10 @@ function SingleAgentPage() {
 
           {/* Main content area - now wider */}
           <div className="lg:col-span-6">
-            <div className="bg-white/60 rounded-lg shadow-sm p-6 mb-6 min-h-[600px]">
+            <div className="bg-white/60 rounded-lg shadow-sm p-6 mb-6">
               <div className="relative z-10">
                 <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
                 <p className="text-gray-600 mb-6">{agent?.description}</p>
-                
-                <QuestionInput
-                  value={question}
-                  onChange={setQuestion}
-                  onSubmit={handleSubmit}
-                  placeholder="Posez votre question..."
-                  disabled={loadingQuery}
-                />
 
                 {/* Current conversation */}
                 <div className="mt-6 space-y-4">
@@ -276,6 +268,51 @@ function SingleAgentPage() {
                 queryId={conversations[conversations.length - 1].id}
               />
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Floating input area */}
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-lg">
+          <div className="container mx-auto px-4 py-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex gap-4 items-center">
+                <div className="flex-1">
+                  <QuestionInput
+                    value={question}
+                    onChange={setQuestion}
+                    onSubmit={handleSubmit}
+                    placeholder="Posez votre question..."
+                    disabled={loadingQuery}
+                    style={{
+                      backgroundColor: 'white',
+                      borderColor: '#E5E7EB',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                    }}
+                  />
+                </div>
+                <button
+                  onClick={handleSubmit}
+                  disabled={loadingQuery || !question.trim()}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap h-[60px] flex items-center justify-center gap-2"
+                >
+                  {loadingQuery ? (
+                    <>
+                      <LoadingSpinner />
+                      <span>Thinking...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+                      </svg>
+                      <span>Ask Question</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
