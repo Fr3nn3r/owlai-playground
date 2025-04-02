@@ -27,39 +27,6 @@ function Playground() {
   // Get current conversation for selected agent
   const currentConversation = selectedAgent ? conversations[selectedAgent.id] || [] : [];
 
-  // Update conversation when question is edited
-  useEffect(() => {
-    if (!question || !selectedAgent) return;
-
-    const currentMessages = conversations[selectedAgent.id] || [];
-    const lastMessage = currentMessages[currentMessages.length - 1];
-    
-    // If last message is from user and hasn't been responded to yet, update it
-    if (lastMessage && lastMessage.role === 'user' && 
-        (!currentMessages[currentMessages.length - 2] || 
-         currentMessages[currentMessages.length - 2].role === 'user')) {
-      setConversations(prev => ({
-        ...prev,
-        [selectedAgent.id]: [
-          ...currentMessages.slice(0, -1),
-          { role: 'user', content: question }
-        ]
-      }));
-    }
-  }, [question, selectedAgent]);
-
-  // Auto-scroll to bottom when new messages are added
-  const scrollToBottom = () => {
-    const chatContainer = document.querySelector('.chat-messages-container');
-    if (chatContainer) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [currentConversation]);
-
   useEffect(() => {
     const AGENT_API_URL = `${API_URL}/agents`;
     console.log("📡 Fetching agents from:", AGENT_API_URL);
@@ -94,7 +61,12 @@ function Playground() {
       .finally(() => setLoadingAgents(false));
   }, [API_URL]);
 
-  // Fetch default queries when agent is selected
+  const handleQuerySelect = (query) => {
+    // Only set the question in the input field, nothing else
+    setQuestion(query);
+  };
+
+  // Remove any effects that watch question changes
   useEffect(() => {
     if (!selectedAgent) return;
 
@@ -114,13 +86,21 @@ function Playground() {
   }, [selectedAgent, API_URL]);
 
   const handleSubmit = async () => {
-    if (!question || !selectedAgent) return;
-  
+    if (!question || !selectedAgent || loadingQuery) return;
+
     setLoadingQuery(true);
     setError("");
-    setIsTyping(true); // Show waiting box until first streaming characters arrive
     
     try {
+      // Add user message to conversation
+      setConversations(prev => ({
+        ...prev,
+        [selectedAgent.id]: [
+          ...(prev[selectedAgent.id] || []),
+          { role: 'user', content: question }
+        ]
+      }));
+
       const response = await fetch(`${API_URL}/stream-query`, {
         method: "POST",
         headers: {
@@ -134,26 +114,6 @@ function Playground() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let streamedResponse = "";
-      let isFirstChunk = true;
-
-      // Add user message to conversation only if it's not already there
-      setConversations(prev => {
-        const currentMessages = prev[selectedAgent.id] || [];
-        const lastMessage = currentMessages[currentMessages.length - 1];
-        
-        // If the last message is already from the user with the same content, don't add it again
-        if (lastMessage && lastMessage.role === 'user' && lastMessage.content === question) {
-          return prev;
-        }
-        
-        return {
-          ...prev,
-          [selectedAgent.id]: [
-            ...currentMessages,
-            { role: 'user', content: question }
-          ]
-        };
-      });
 
       while (true) {
         const { done, value } = await reader.read();
@@ -164,40 +124,38 @@ function Playground() {
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = JSON.parse(line.slice(6));
-            streamedResponse += data.content;
-            
-            // Hide waiting box after first chunk is received
-            if (isFirstChunk) {
-              setIsTyping(false);
-              isFirstChunk = false;
-            }
-            
-            // Update conversation with streaming response
-            setConversations(prev => {
-              const currentMessages = prev[selectedAgent.id] || [];
-              const lastMessage = currentMessages[currentMessages.length - 1];
+            try {
+              const data = JSON.parse(line.slice(6));
+              streamedResponse += data.content;
               
-              if (lastMessage && lastMessage.role === 'assistant') {
-                // Update existing assistant message
-                return {
-                  ...prev,
-                  [selectedAgent.id]: [
-                    ...currentMessages.slice(0, -1),
-                    { role: 'assistant', content: streamedResponse }
-                  ]
-                };
-              } else {
-                // Add new assistant message
-                return {
-                  ...prev,
-                  [selectedAgent.id]: [
-                    ...currentMessages,
-                    { role: 'assistant', content: streamedResponse }
-                  ]
-                };
-              }
-            });
+              // Update conversation with the current streamed response
+              setConversations(prev => {
+                const currentConv = prev[selectedAgent.id] || [];
+                const lastMsg = currentConv[currentConv.length - 1];
+                
+                if (lastMsg && lastMsg.role === 'assistant') {
+                  // Update existing assistant message
+                  return {
+                    ...prev,
+                    [selectedAgent.id]: [
+                      ...currentConv.slice(0, -1),
+                      { ...lastMsg, content: streamedResponse }
+                    ]
+                  };
+                } else {
+                  // Add new assistant message
+                  return {
+                    ...prev,
+                    [selectedAgent.id]: [
+                      ...currentConv,
+                      { role: 'assistant', content: streamedResponse }
+                    ]
+                  };
+                }
+              });
+            } catch (e) {
+              console.error('Error parsing streaming data:', e);
+            }
           }
         }
       }
@@ -215,13 +173,7 @@ function Playground() {
       }));
     } finally {
       setLoadingQuery(false);
-      setIsTyping(false);
     }
-  };
-
-  const handleQuerySelect = (query) => {
-    setQuestion(query);
-    handleSubmit();
   };
 
   return (
@@ -230,7 +182,7 @@ function Playground() {
         {/* Main Container - Fixed height */}
         <div className="flex flex-col lg:flex-row h-screen">
           {/* Left Column - Agent Selection (25%) - Fixed */}
-          <div className="lg:w-25 p-6 border-b lg:border-b-0 lg:border-r border-neutral-200">
+          <div className="lg:w-1/4 p-6 border-b lg:border-b-0 lg:border-r border-neutral-200">
             <div className="space-y-6">
               <h2 className="text-2xl font-bold tracking-tight mb-6 text-neutral-800">Select an Agent</h2>
               
@@ -255,7 +207,7 @@ function Playground() {
           </div>
 
           {/* Middle Column - Default Questions (20%) - Fixed */}
-          <div className="lg:w-20 p-6 border-b lg:border-b-0 lg:border-r border-neutral-200 flex flex-col">
+          <div className="lg:w-1/5 p-6 border-b lg:border-b-0 lg:border-r border-neutral-200 flex flex-col">
             {selectedAgent && (
               <div className="space-y-6 flex flex-col h-full">
                 <h3 className="text-xl font-semibold tracking-tight text-neutral-800">Suggested Questions</h3>
@@ -271,12 +223,12 @@ function Playground() {
           </div>
 
           {/* Right Column - Chat Area (55%) - Scrollable */}
-          <div className="lg:w-55 flex flex-col flex-1 relative">
+          <div className="lg:flex-1 flex flex-col relative">
             {/* Fixed Background Container */}
-            <div className="absolute inset-0 bg-neutral-50">
+            <div className="absolute inset-0 bg-neutral-50/80">
               {/* Background Owl - Fixed */}
               {selectedAgent && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10">
                   <img
                     src={selectedAgent.owl_image_url?.startsWith('/') 
                       ? selectedAgent.owl_image_url.replace(/^\/public/, '')
@@ -285,13 +237,6 @@ function Playground() {
                     alt={`${selectedAgent.name} owl background`}
                     className="w-[90%] h-[90%] object-contain"
                     onError={(e) => {
-                      console.error('Failed to load background owl image:', {
-                        agentId: selectedAgent.id,
-                        agentName: selectedAgent.name,
-                        attemptedUrl: selectedAgent.owl_image_url,
-                        fallbackUrl: '/owl-default.jpg',
-                        timestamp: new Date().toISOString()
-                      });
                       e.target.src = '/owl-default.jpg';
                     }}
                   />
@@ -301,108 +246,111 @@ function Playground() {
 
             {/* Scrollable Chat Container */}
             <div className="relative flex-1 overflow-y-auto">
-              {/* Loading Overlay */}
-              {loadingQuery && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-10">
-                  <LoadingSpinner />
-                </div>
-              )}
-
               {/* Chat Messages */}
               <div className="p-6 space-y-4 relative z-20 pb-40 chat-messages-container">
-                {currentConversation.map((msg, index) => (
-                  <div 
-                    key={index} 
-                    className={`p-4 rounded-xl shadow-soft animate-fadeInUp ${
-                      msg.role === 'user' 
-                        ? 'ml-4 bg-white border-2 border-primary/20 shadow-hover' 
-                        : 'mr-4 bg-white/90 backdrop-blur-sm border border-neutral-200'
-                    }`}
-                    style={{
-                      animationDelay: `${index * 50}ms`,
-                      transform: 'scale(1)',
-                      opacity: 1,
-                    }}
-                  >
+                {currentConversation.length === 0 ? (
+                  <div className="text-center text-gray-500 mt-8">
+                    <p>No messages yet. Start by asking a question!</p>
+                  </div>
+                ) : (
+                  currentConversation.map((msg, index) => (
                     <div 
-                      className="font-semibold mb-1 flex items-center gap-2"
-                      style={{
-                        color: msg.role === 'user' 
-                          ? '#2563EB' 
-                          : '#374151'
-                      }}
+                      key={index} 
+                      className={`p-4 rounded-xl shadow-sm transition-all ${
+                        msg.role === 'user' 
+                          ? 'ml-auto mr-4 bg-primary/5 border border-primary/20 max-w-[80%]' 
+                          : 'ml-4 mr-auto bg-white border border-neutral-200 max-w-[80%]'
+                      }`}
                     >
-                      {msg.role === 'user' ? (
-                        <>
-                          <span className="text-primary">You</span>
-                          <span className="text-xs bg-primary/10 px-2 py-0.5 rounded-full">Question</span>
-                        </>
-                      ) : (
-                        selectedAgent?.name
+                      <div 
+                        className="font-semibold mb-2 flex items-center gap-2"
+                        style={{
+                          color: msg.role === 'user' ? '#2563EB' : '#374151'
+                        }}
+                      >
+                        {msg.role === 'user' ? (
+                          <>
+                            <span className="text-primary">You</span>
+                            <span className="text-xs bg-primary/10 px-2 py-0.5 rounded-full">Question</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>{selectedAgent?.name}</span>
+                            <span className="text-xs bg-neutral-100 px-2 py-0.5 rounded-full">Response</span>
+                          </>
+                        )}
+                      </div>
+                      <div className={`whitespace-pre-wrap leading-relaxed ${
+                        msg.role === 'user' 
+                          ? 'text-neutral-900' 
+                          : 'text-neutral-800'
+                      }`}>
+                        {msg.content}
+                      </div>
+                      {msg.role === 'assistant' && !loadingQuery && (
+                        <div className="mt-4 pt-4 border-t border-neutral-100">
+                          <FeedbackComponent
+                            queryId={`${selectedAgent.id}-${index}`}
+                            agentId={selectedAgent.id}
+                            onFeedbackSubmitted={() => {
+                              console.log('Feedback submitted for message:', index);
+                            }}
+                          />
+                        </div>
                       )}
                     </div>
-                    <div className={`whitespace-pre-wrap leading-relaxed ${
-                      msg.role === 'user' 
-                        ? 'text-neutral-900 font-medium' 
-                        : 'text-neutral-800'
-                    }`}>{msg.content}</div>
-                    {msg.role === 'assistant' && (
-                      <FeedbackComponent
-                        queryId={`${selectedAgent.id}-${index}`}
-                        agentId={selectedAgent.id}
-                        onFeedbackSubmitted={() => {
-                          console.log('Feedback submitted for message:', index);
-                        }}
-                      />
-                    )}
-                  </div>
-                ))}
-                {isTyping && (
-                  <div className="ml-4 bg-white/70 p-4 rounded-xl shadow-soft animate-fadeIn border border-neutral-200">
-                    <div className="font-semibold mb-1 text-neutral-700">{selectedAgent?.name}</div>
-                    <TypingIndicator />
+                  ))
+                )}
+                {loadingQuery && (
+                  <div className="ml-4 mr-auto bg-white border border-neutral-200 p-4 rounded-xl shadow-sm animate-pulse max-w-[80%]">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                      <div className="h-4 w-12 bg-gray-200 rounded"></div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
+                      <div className="h-4 w-1/2 bg-gray-200 rounded"></div>
+                    </div>
                   </div>
                 )}
                 <div ref={chatEndRef} />
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Input Section - Fixed at bottom */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 shadow-soft z-50">
-          <div className="max-w-[1920px] mx-auto">
-            <div className="lg:ml-[45%] p-4">
-              <div className="max-w-3xl">
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <QuestionInput 
-                      question={question} 
-                      setQuestion={setQuestion}
-                      onSubmit={handleSubmit}
-                      style={{
-                        borderColor: '#E5E7EB',
-                        '&:focus': {
-                          borderColor: '#2563EB',
-                          boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.1)',
-                        }
-                      }}
-                    />
+            {/* Input Section - Fixed at bottom */}
+            <div className="sticky bottom-0 bg-white border-t border-neutral-200 shadow-md z-50">
+              <div className="p-4">
+                <div className="max-w-3xl mx-auto">
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <QuestionInput 
+                        question={question} 
+                        setQuestion={setQuestion}
+                        onSubmit={handleSubmit}
+                        style={{
+                          borderColor: '#E5E7EB',
+                          '&:focus': {
+                            borderColor: '#2563EB',
+                            boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.1)',
+                          }
+                        }}
+                      />
+                    </div>
+                    <button
+                      onClick={handleSubmit}
+                      disabled={loadingQuery || !question || !selectedAgent}
+                      className="px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md text-white font-medium bg-primary hover:bg-primary-dark active:scale-95 whitespace-nowrap"
+                    >
+                      {loadingQuery ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <LoadingSpinner />
+                          <span>Thinking...</span>
+                        </div>
+                      ) : (
+                        "Ask Question"
+                      )}
+                    </button>
                   </div>
-                  <button
-                    onClick={handleSubmit}
-                    disabled={loadingQuery || !question || !selectedAgent}
-                    className="px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-hover text-white font-medium bg-primary hover:bg-primary-dark active:scale-95 whitespace-nowrap"
-                  >
-                    {loadingQuery ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <LoadingSpinner />
-                        <span>Thinking...</span>
-                      </div>
-                    ) : (
-                      "Ask Question"
-                    )}
-                  </button>
                 </div>
               </div>
             </div>
