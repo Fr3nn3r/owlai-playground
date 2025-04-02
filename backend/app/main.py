@@ -348,3 +348,24 @@ async def get_all_feedback():
         },
     ]
     return mock_feedback
+
+
+@app.get("/query/{query_id}")
+async def get_shared_query(query_id: str):
+    """
+    Retrieve a shared query and its response.
+    This is a mock implementation - in production, you would fetch this from your database.
+    """
+    # Mock data - replace with actual database query in production
+    mock_shared_queries = {
+        "example-query-1": {
+            "question": "What is artificial intelligence?",
+            "response": "Artificial Intelligence (AI) refers to the simulation of human intelligence in machines...",
+            "timestamp": "2024-03-20T10:30:00Z",
+        }
+    }
+
+    if query_id not in mock_shared_queries:
+        raise HTTPException(status_code=404, detail="Shared content not found")
+
+    return mock_shared_queries[query_id]

@@ -7,6 +7,8 @@ import DefaultQueries from "./DefaultQueries";
 import TypingIndicator from "./TypingIndicator";
 import FeedbackComponent from "./FeedbackComponent";
 import ChunkViewer from "./ChunkViewer";
+import ShareButtons from "./ShareButtons";
+import MetaTags from "./MetaTags";
 import config from "../config";
 
 function SingleAgentPage() {
@@ -166,6 +168,10 @@ function SingleAgentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
+      <MetaTags
+        title={response ? `OwlAI - ${question}` : undefined}
+        description={response ? `${response.slice(0, 150)}...` : undefined}
+      />
       {/* Single owl background for entire page */}
       <div 
         className="fixed inset-0 pointer-events-none"
@@ -232,14 +238,21 @@ function SingleAgentPage() {
                   <div className="mt-6">
                     <div className="bg-gray-50/60 rounded-lg p-4">
                       <p className="whitespace-pre-wrap">{response}</p>
+                      {isTyping && <TypingIndicator />}
+                      <div className="mt-4">
+                        <FeedbackComponent
+                          queryId={conversations[conversations.length - 1]?.id}
+                          agentId={agent?.id}
+                        />
+                      </div>
                     </div>
-                    {isTyping && <TypingIndicator />}
-                    <div className="mt-4">
-                      <FeedbackComponent
+                    {!isTyping && (
+                      <ShareButtons
+                        question={question}
+                        response={response}
                         queryId={conversations[conversations.length - 1]?.id}
-                        agentId={agent?.id}
                       />
-                    </div>
+                    )}
                   </div>
                 )}
               </div>

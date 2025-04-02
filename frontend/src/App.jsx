@@ -10,6 +10,7 @@ import TypingIndicator from "./components/TypingIndicator";
 import SingleAgentPage from "./components/SingleAgentPage";
 import Playground from "./components/Playground";
 import FeedbackDashboard from "./components/FeedbackDashboard";
+import SharedPage from "./components/SharedPage";
 import config from "./config";
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
           <Route path="/" element={<Playground />} />
           <Route path="/single-agent" element={<SingleAgentPage />} />
           <Route path="/feedback" element={<FeedbackDashboard />} />
+          <Route path="/shared/:queryId" element={<SharedPage />} />
         </Routes>
       </div>
     </Router>
