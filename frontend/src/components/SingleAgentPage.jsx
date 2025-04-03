@@ -98,9 +98,14 @@ function SingleAgentPage() {
   // Scroll to follow the streaming response
   useEffect(() => {
     if (latestConversationRef.current && loadingQuery) {
-      latestConversationRef.current.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'end'
+      const headerOffset = 100; // Account for any fixed headers
+      const element = latestConversationRef.current;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
       });
     }
   }, [response, loadingQuery]); // Run when response updates during streaming
@@ -150,12 +155,20 @@ function SingleAgentPage() {
         return newConv;
       });
 
+      // Set the new conversation as selected immediately
+      setSelectedConversationId(queryId);
+
       // Initial scroll to the new conversation
       setTimeout(() => {
         if (latestConversationRef.current) {
-          latestConversationRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
+          const headerOffset = 100; // Account for any fixed headers
+          const element = latestConversationRef.current;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
           });
         }
       }, 100);
@@ -302,12 +315,14 @@ function SingleAgentPage() {
                     conversations.map((conv, index) => (
                       <div 
                         key={conv.id} 
-                        className={`bg-white/60 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-white/80 transition-all duration-200 ${
+                        className={`bg-white/60 rounded-lg shadow-sm p-4 ${
+                          !loadingQuery ? 'cursor-pointer hover:bg-white/80' : ''
+                        } transition-all duration-200 ${
                           selectedConversationId === conv.id ? 'ring-2 ring-blue-500' : ''
                         }`}
                         ref={index === conversations.length - 1 ? latestConversationRef : null}
                         onClick={() => {
-                          if (conv.id !== selectedConversationId) {
+                          if (!loadingQuery && conv.id !== selectedConversationId) {
                             fetchChunks(conv.id);
                           }
                         }}
