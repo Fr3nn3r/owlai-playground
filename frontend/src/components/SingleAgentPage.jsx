@@ -25,6 +25,7 @@ function SingleAgentPage() {
   const [loadingChunks, setLoadingChunks] = useState(false);
   const chatEndRef = useRef(null);
   const latestConversationRef = useRef(null);
+  const [selectedConversationId, setSelectedConversationId] = useState(null);
 
   const { API_URL } = config;
 
@@ -92,11 +93,13 @@ function SingleAgentPage() {
 
   const fetchChunks = async (queryId) => {
     setLoadingChunks(true);
+    setChunks([]); // Clear existing chunks immediately
     try {
       const response = await fetch(`${API_URL}/query/${queryId}/chunks`);
       if (!response.ok) throw new Error('Failed to fetch chunks');
       const data = await response.json();
       setChunks(data);
+      setSelectedConversationId(queryId);
     } catch (err) {
       console.error('Error fetching chunks:', err);
       setChunks([]);
@@ -282,28 +285,32 @@ function SingleAgentPage() {
                     conversations.map((conv, index) => (
                       <div 
                         key={conv.id} 
-                        className="bg-white/60 rounded-lg shadow-sm p-4"
+                        className={`bg-white/60 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-white/80 transition-all duration-200 ${
+                          selectedConversationId === conv.id ? 'ring-2 ring-blue-500' : ''
+                        }`}
                         ref={index === conversations.length - 1 ? latestConversationRef : null}
+                        onClick={() => {
+                          if (conv.id !== selectedConversationId) {
+                            fetchChunks(conv.id);
+                          }
+                        }}
                       >
                         <div className="font-medium mb-2">
-                          {console.log('📄 Rendering question:', conv.question)}
-                          {conv.question}
+                          <span className="text-gray-800">Question: </span>
+                          <span className="text-gray-600">{conv.question}</span>
+                        </div>
+                        <div className="text-gray-800">
+                          <span className="font-medium">Réponse: </span>
+                          <span className="whitespace-pre-wrap">
+                            {conv.answer || 'En attente de réponse...'}
+                          </span>
                         </div>
                         {conv.answer && (
-                          <div className="bg-gray-50/60 rounded-lg p-4">
-                            {console.log('📄 Rendering answer:', conv.answer)}
-                            <p className="whitespace-pre-wrap">{conv.answer}</p>
-                            <div className="mt-4">
-                              <FeedbackComponent
-                                queryId={conv.id}
-                                agentId={agent?.id}
-                              />
-                            </div>
-                          </div>
-                        )}
-                        {index === conversations.length - 1 && loadingQuery && !conv.answer && (
-                          <div className="flex justify-center my-4">
-                            <LoadingSpinner />
+                          <div className="mt-4">
+                            <FeedbackComponent
+                              queryId={conv.id}
+                              agentId={agent?.id}
+                            />
                           </div>
                         )}
                       </div>
@@ -334,7 +341,14 @@ function SingleAgentPage() {
           {/* Right panel - Document chunks */}
           <div className="lg:col-span-3">
             <div className="bg-white/60 rounded-lg shadow-sm p-6 sticky top-4">
-              <h2 className="text-lg font-semibold mb-4 text-gray-700">Extraits</h2>
+              <h2 className="text-lg font-semibold mb-4 text-gray-700">
+                Extraits
+                {selectedConversationId && (
+                  <span className="text-sm font-normal text-gray-500 ml-2">
+                    pour la question sélectionnée
+                  </span>
+                )}
+              </h2>
               <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
                 {loadingChunks ? (
                   <div className="flex justify-center py-8">
@@ -343,9 +357,13 @@ function SingleAgentPage() {
                 ) : chunks.length > 0 ? (
                   <div className="space-y-4">
                     {chunks.map((chunk, index) => (
-                      <div key={chunk.id} className="chunk-container p-4 rounded-lg bg-white/80 border border-gray-200">
+                      <div 
+                        key={chunk.id} 
+                        className="chunk-container p-4 rounded-lg bg-white/80 border border-gray-200 transition-all duration-200"
+                        data-chunk-id={chunk.id}
+                      >
                         <div className="flex justify-between items-start mb-2">
-                          <div className="text-sm text-gray-600">
+                          <div className="text-xs text-gray-600">
                             {chunk.source}
                           </div>
                           <button
@@ -366,7 +384,7 @@ function SingleAgentPage() {
                         <div 
                           className="content-wrapper h-24 overflow-hidden transition-all duration-300 ease-in-out"
                         >
-                          <p className="text-sm text-gray-800">
+                          <p className="text-xs text-gray-800 italic">
                             {chunk.content}
                           </p>
                         </div>
