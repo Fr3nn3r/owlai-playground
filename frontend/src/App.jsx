@@ -23,7 +23,7 @@ function App() {
           {/* Left side - Marianne link */}
           <div className="flex items-center">
             <Link 
-              to="/single-agent" 
+              to="/" 
               className="text-sm font-semibold text-gray-800 hover:text-primary transition-colors"
             >
               Marianne
@@ -71,8 +71,8 @@ function App() {
       {/* Content with top padding for the fixed nav */}
       <div className="pt-16">
         <Routes>
-          <Route path="/" element={<Playground />} />
-          <Route path="/single-agent" element={<SingleAgentPage />} />
+          <Route path="/" element={<SingleAgentPage />} />
+          <Route path="/playground" element={<Playground />} />
           <Route path="/feedback" element={<FeedbackDashboard />} />
           <Route path="/shared/:queryId" element={<SharedPage />} />
         </Routes>
