@@ -1,6 +1,27 @@
 import { useState, useEffect } from 'react';
 import config from '../config';
 
+function TruncatedText({ text, maxLength = 100 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldTruncate = text.length > maxLength;
+  
+  if (!shouldTruncate) return <span>{text}</span>;
+  
+  return (
+    <div className="relative">
+      <span>
+        {isExpanded ? text : `${text.slice(0, maxLength)}...`}
+      </span>
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="ml-2 text-xs text-blue-600 hover:text-blue-800"
+      >
+        {isExpanded ? 'Voir moins' : 'Voir plus'}
+      </button>
+    </div>
+  );
+}
+
 function FeedbackDashboard() {
   const [feedback, setFeedback] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,68 +100,60 @@ function FeedbackDashboard() {
         </select>
       </div>
 
-      {/* Feedback Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sortedFeedback.map((item, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <div className="flex items-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <span
-                      key={i}
-                      className={`${
-                        i < item.rating ? 'text-yellow-400' : 'text-gray-300'
-                      }`}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {new Date(item.timestamp).toLocaleString()}
-                </div>
-              </div>
-              <span className="text-sm font-medium px-2 py-1 rounded-full bg-gray-100">
-                {item.agent_id}
-              </span>
-            </div>
-            
-            <div className="mb-4">
-              <div className="font-medium text-gray-700 mb-2">Query:</div>
-              <div className="text-gray-600 bg-gray-50 p-3 rounded-lg text-sm">
-                {item.query}
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <div className="font-medium text-gray-700 mb-2">Response:</div>
-              <div className="text-gray-600 bg-gray-50 p-3 rounded-lg text-sm">
-                {item.response}
-              </div>
-            </div>
-
-            {item.comment && (
-              <div className="mb-4">
-                <div className="font-medium text-gray-700 mb-2">Comment:</div>
-                <div className="text-gray-600 italic">
-                  "{item.comment}"
-                </div>
-              </div>
-            )}
-
-            {/* View Details Button */}
-            <button
-              onClick={() => window.open(`/query/${item.query_id}/logs`, '_blank')}
-              className="mt-4 text-sm text-primary hover:text-primary-dark transition-colors"
-            >
-              View Query Logs →
-            </button>
-          </div>
-        ))}
+      {/* Feedback Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow-sm rounded-lg">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comment</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Query</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Response</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {filteredFeedback.map((item, index) => (
+              <tr key={index} className="hover:bg-gray-50">
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <span
+                        key={i}
+                        className={`text-sm ${
+                          i < item.rating ? 'text-yellow-400' : 'text-gray-300'
+                        }`}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="text-sm text-gray-900">
+                    {item.comment ? (
+                      <TruncatedText text={item.comment} maxLength={50} />
+                    ) : (
+                      <span className="text-gray-400 italic">No comment</span>
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="text-sm text-gray-900">
+                    <TruncatedText text={item.query} maxLength={75} />
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="text-sm text-gray-900">
+                    <TruncatedText text={item.response} maxLength={100} />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {sortedFeedback.length === 0 && (
+      {filteredFeedback.length === 0 && (
         <div className="text-center text-gray-500 py-12">
           No feedback found matching the current filters.
         </div>

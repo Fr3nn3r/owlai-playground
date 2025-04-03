@@ -295,11 +295,6 @@ function SingleAgentPage() {
                 <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
                 <p className="text-gray-600 mb-6">{agent?.description}</p>
 
-                {/* Session indicator */}
-                <div className="text-sm text-gray-500 mb-4">
-                  Session de conversation: {currentSessionId}
-                </div>
-
                 {/* Current conversation */}
                 <div className="mt-6 space-y-4">
                   {conversations.length > 0 && (
