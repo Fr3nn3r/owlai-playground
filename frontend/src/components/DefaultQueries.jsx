@@ -12,7 +12,7 @@ const DefaultQueries = ({ queries, onQuerySelect, selectedAgent }) => {
         <button
           key={index}
           onClick={() => onQuerySelect(query)}
-          className="w-full text-left p-4 rounded-xl bg-white border border-neutral-200 hover:border-primary-light hover:bg-primary-50 transition-all duration-200 shadow-soft hover:shadow-hover active:scale-95 animate-fadeInUp"
+          className="w-full text-left p-3 rounded-xl bg-white border border-neutral-200 hover:border-primary-light hover:bg-primary-50 transition-all duration-200 shadow-soft hover:shadow-hover active:scale-95 animate-fadeInUp"
           style={{
             animationDelay: `${index * 50}ms`,
             '--tw-translate-y': '0',
@@ -20,7 +20,7 @@ const DefaultQueries = ({ queries, onQuerySelect, selectedAgent }) => {
             '--tw-scale-y': '1',
           }}
         >
-          <span className="text-neutral-700 hover:text-primary-dark transition-colors duration-200">
+          <span className="text-sm text-neutral-700 hover:text-primary-dark transition-colors duration-200">
             {query}
           </span>
         </button>

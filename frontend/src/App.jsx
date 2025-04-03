@@ -43,7 +43,7 @@ function App() {
           {/* Right side - Social links and Dashboard */}
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/Fr3nn3r/owlai.git"
+              href="https://github.com/Fr3nn3r"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-600 hover:text-gray-800 transition-colors"
@@ -51,7 +51,7 @@ function App() {
               <FaGithub className="w-5 h-5" />
             </a>
             <a
-              href="https://www.linkedin.com/in/frdbrunner/"
+              href="https://www.linkedin.com/in/frdbrunner"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-600 hover:text-gray-800 transition-colors"

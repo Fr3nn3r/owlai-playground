@@ -303,7 +303,7 @@ function SingleAgentPage() {
 
           {/* Main content area - center */}
           <div className="lg:col-span-6">
-            <div className="bg-white/60 rounded-lg shadow-sm p-6 mb-6">
+            <div className="bg-white/80 hover:bg-white/100 rounded-lg shadow-sm p-6 mb-6 transition-all duration-200">
               <div className="relative z-10">
                 <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
                 <p className="text-gray-600 mb-6">{agent?.description}</p>
@@ -315,8 +315,8 @@ function SingleAgentPage() {
                     conversations.map((conv, index) => (
                       <div 
                         key={conv.id} 
-                        className={`bg-white/60 rounded-lg shadow-sm p-4 ${
-                          !loadingQuery ? 'cursor-pointer hover:bg-white/80' : ''
+                        className={`p-4 rounded-lg mb-6 bg-white/80 hover:bg-white/100 ${
+                          !loadingQuery ? 'cursor-pointer' : ''
                         } transition-all duration-200 ${
                           selectedConversationId === conv.id ? 'ring-2 ring-blue-500' : ''
                         }`}
@@ -327,15 +327,22 @@ function SingleAgentPage() {
                           }
                         }}
                       >
-                        <div className="font-medium mb-2">
+                        <div className="font-medium mb-2 text-sm">
                           <span className="text-gray-800">Question: </span>
                           <span className="text-gray-600">{conv.question}</span>
                         </div>
-                        <div className="text-gray-800">
-                          <span className="font-medium">Réponse: </span>
-                          <span className="whitespace-pre-wrap">
-                            {conv.answer || 'En attente de réponse...'}
-                          </span>
+                        <div className="text-gray-800 text-sm">
+                          {conv.answer ? (
+                            <>
+                              <span className="font-medium">Réponse: </span>
+                              <span className="whitespace-pre-wrap">{conv.answer}</span>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <LoadingSpinner />
+                              <span>En attente de réponse...</span>
+                            </div>
+                          )}
                         </div>
                         {conv.answer && (
                           <div className="mt-4">
@@ -359,15 +366,6 @@ function SingleAgentPage() {
                 )}
               </div>
             </div>
-
-            {/* Share buttons for the latest response */}
-            {conversations.length > 0 && conversations[conversations.length - 1].answer && (
-              <ShareButtons
-                question={conversations[conversations.length - 1].question}
-                response={conversations[conversations.length - 1].answer}
-                queryId={conversations[conversations.length - 1].id}
-              />
-            )}
           </div>
 
           {/* Right panel - Document chunks */}
@@ -433,6 +431,9 @@ function SingleAgentPage() {
           </div>
         </div>
       </div>
+
+      {/* Always render ShareButtons */}
+      <ShareButtons />
 
       {/* Floating input area */}
       <div className="fixed bottom-0 left-0 right-0 z-50">

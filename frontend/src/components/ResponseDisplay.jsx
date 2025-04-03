@@ -1,6 +1,19 @@
 import React from 'react';
+import LoadingSpinner from './LoadingSpinner';
 
-const ResponseDisplay = ({ response }) => {
+const ResponseDisplay = ({ response, isLoading }) => {
+  if (isLoading) {
+    return (
+      <div className="mt-6">
+        <div className="bg-gray-50 rounded-lg p-6 shadow-sm border border-gray-100">
+          <div className="flex justify-center items-center py-8">
+            <LoadingSpinner />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!response) return null;
 
   return (
@@ -14,7 +27,7 @@ const ResponseDisplay = ({ response }) => {
         </div>
         <div className="prose prose-pink max-w-none">
           {response.split('\n').map((paragraph, index) => (
-            <p key={index} className="text-gray-700 mb-4">
+            <p key={index} className="text-sm text-gray-700 mb-3">
               {paragraph}
             </p>
           ))}
