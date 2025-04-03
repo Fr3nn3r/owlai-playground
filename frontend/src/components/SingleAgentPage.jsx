@@ -21,6 +21,8 @@ function SingleAgentPage() {
   const [defaultQueries, setDefaultQueries] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [version, setVersion] = useState(null);
+  const [chunks, setChunks] = useState([]);
+  const [loadingChunks, setLoadingChunks] = useState(false);
   const chatEndRef = useRef(null);
   const latestConversationRef = useRef(null);
 
@@ -88,6 +90,21 @@ function SingleAgentPage() {
     }
   }, [response, loadingQuery]); // Run when response updates during streaming
 
+  const fetchChunks = async (queryId) => {
+    setLoadingChunks(true);
+    try {
+      const response = await fetch(`${API_URL}/query/${queryId}/chunks`);
+      if (!response.ok) throw new Error('Failed to fetch chunks');
+      const data = await response.json();
+      setChunks(data);
+    } catch (err) {
+      console.error('Error fetching chunks:', err);
+      setChunks([]);
+    } finally {
+      setLoadingChunks(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!question.trim()) return;
     
@@ -96,6 +113,7 @@ function SingleAgentPage() {
     setError("");
     setIsTyping(true);
     setResponse("");
+    setChunks([]); // Reset chunks for new query
     
     try {
       const queryId = `${agent.id}-${Date.now()}`;
@@ -188,9 +206,13 @@ function SingleAgentPage() {
 
       console.log('✅ Finished streaming response');
       
+      // After receiving the response, fetch the chunks
+      await fetchChunks(queryId);
+
     } catch (err) {
       console.error("❌ Error during submission:", err);
       setError("Échec de la réponse. Veuillez réessayer.");
+      setChunks([]); // Clear chunks on error
       
       setConversations(prev => 
         prev.map(conv => 
@@ -312,27 +334,48 @@ function SingleAgentPage() {
           {/* Right panel - Document chunks */}
           <div className="lg:col-span-3">
             <div className="bg-white/60 rounded-lg shadow-sm p-6 sticky top-4">
-              <h2 className="text-lg font-semibold mb-4 text-gray-700">Sources</h2>
+              <h2 className="text-lg font-semibold mb-4 text-gray-700">Extraits</h2>
               <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
-                {loadingQuery ? (
+                {loadingChunks ? (
                   <div className="flex justify-center py-8">
                     <LoadingSpinner />
                   </div>
-                ) : conversations.length > 0 && conversations[conversations.length - 1].answer ? (
+                ) : chunks.length > 0 ? (
                   <div className="space-y-4">
-                    {/* Example chunks - replace with actual data */}
-                    <div className="p-4 rounded-lg bg-white/80 border border-gray-200">
-                      <div className="text-sm text-gray-600 mb-2">Source 1</div>
-                      <p className="text-sm text-gray-800">Relevant content from the document...</p>
-                    </div>
-                    <div className="p-4 rounded-lg bg-white/80 border border-gray-200">
-                      <div className="text-sm text-gray-600 mb-2">Source 2</div>
-                      <p className="text-sm text-gray-800">Additional context from another source...</p>
-                    </div>
+                    {chunks.map((chunk, index) => (
+                      <div key={chunk.id} className="chunk-container p-4 rounded-lg bg-white/80 border border-gray-200">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="text-sm text-gray-600">
+                            {chunk.source}
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              const contentWrapper = e.target.closest('.chunk-container').querySelector('.content-wrapper');
+                              const isExpanded = contentWrapper.classList.contains('h-auto');
+                              
+                              contentWrapper.style.maxHeight = isExpanded ? '6rem' : `${contentWrapper.scrollHeight}px`;
+                              contentWrapper.classList.toggle('h-24');
+                              contentWrapper.classList.toggle('h-auto');
+                              e.target.textContent = isExpanded ? 'Voir plus' : 'Voir moins';
+                            }}
+                            className="text-xs text-blue-600 hover:text-blue-800 font-medium ml-2"
+                          >
+                            Voir plus
+                          </button>
+                        </div>
+                        <div 
+                          className="content-wrapper h-24 overflow-hidden transition-all duration-300 ease-in-out"
+                        >
+                          <p className="text-sm text-gray-800">
+                            {chunk.content}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="text-gray-500 text-sm">
-                    Les sources pertinentes apparaîtront ici une fois que vous aurez posé une question.
+                    Les extraits pertinents apparaîtront ici une fois que vous aurez posé une question.
                   </div>
                 )}
               </div>
