@@ -1,34 +1,30 @@
 import { Helmet } from 'react-helmet';
 
-function MetaTags({ title, description, imageUrl, url }) {
-  const defaultTitle = "OwlAI - Assistant IA Intelligent";
-  const defaultDescription = "Posez vos questions à OwlAI et obtenez des réponses intelligentes basées sur l'IA.";
-  const defaultImage = `${window.location.origin}/owl-default.jpg`;
-
-  const finalTitle = title || defaultTitle;
-  const finalDescription = description || defaultDescription;
-  const finalImage = imageUrl || defaultImage;
-  const finalUrl = url || window.location.href;
+function MetaTags({ title, description }) {
+  const defaultTitle = "Intelligence Artificielle sur le droit français";
+  const defaultDescription = "Une intelligence artificielle gratuite 100% française et open source qui répond à des questions de droit.";
+  const imageUrl = `${window.location.origin}/owl-default.jpg`;
 
   return (
     <Helmet>
-      {/* Standard metadata */}
-      <title>{finalTitle}</title>
-      <meta name="description" content={finalDescription} />
+      {/* Basic meta tags */}
+      <title>{title || defaultTitle}</title>
+      <meta name="description" content={description || defaultDescription} />
 
-      {/* OpenGraph metadata */}
-      <meta property="og:title" content={finalTitle} />
-      <meta property="og:description" content={finalDescription} />
-      <meta property="og:image" content={finalImage} />
-      <meta property="og:url" content={finalUrl} />
+      {/* Open Graph meta tags for Facebook and LinkedIn */}
       <meta property="og:type" content="website" />
-      <meta property="og:site_name" content="OwlAI" />
+      <meta property="og:url" content={window.location.href} />
+      <meta property="og:title" content={title || defaultTitle} />
+      <meta property="og:description" content={description || defaultDescription} />
+      <meta property="og:image" content={imageUrl} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
 
-      {/* Twitter Card metadata */}
+      {/* Twitter Card meta tags */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={finalTitle} />
-      <meta name="twitter:description" content={finalDescription} />
-      <meta name="twitter:image" content={finalImage} />
+      <meta name="twitter:title" content={title || defaultTitle} />
+      <meta name="twitter:description" content={description || defaultDescription} />
+      <meta name="twitter:image" content={imageUrl} />
     </Helmet>
   );
 }
