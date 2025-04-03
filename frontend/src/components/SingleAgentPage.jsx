@@ -303,7 +303,7 @@ function SingleAgentPage() {
 
           {/* Main content area - center */}
           <div className="lg:col-span-6">
-            <div className="bg-white/80 hover:bg-white/100 rounded-lg shadow-sm p-6 mb-6 transition-all duration-200">
+            <div className="bg-white/70 hover:bg-white/90 rounded-lg shadow-sm p-6 mb-6 transition-all duration-200">
               <div className="relative z-10">
                 <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
                 <p className="text-gray-600 mb-6">{agent?.description}</p>
@@ -315,7 +315,7 @@ function SingleAgentPage() {
                     conversations.map((conv, index) => (
                       <div 
                         key={conv.id} 
-                        className={`p-4 rounded-lg mb-6 bg-white/80 hover:bg-white/100 ${
+                        className={`p-4 rounded-lg mb-6 bg-white/70 hover:bg-white/90 ${
                           !loadingQuery ? 'cursor-pointer' : ''
                         } transition-all duration-200 ${
                           selectedConversationId === conv.id ? 'ring-2 ring-blue-500' : ''
