@@ -107,6 +107,11 @@ class QueryRequest(BaseModel):
     question: str
     agent_id: str
     query_id: str
+    session_id: str
+
+
+# Dictionary to store session data
+sessions: Dict[str, List[Dict]] = {}
 
 
 @app.get("/agents")
@@ -155,14 +160,33 @@ async def stream_query(payload: QueryRequest):
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
+    # Initialize session if it doesn't exist
+    if payload.session_id not in sessions:
+        sessions[payload.session_id] = []
+
+    # Add query to session history
+    sessions[payload.session_id].append(
+        {
+            "query_id": payload.query_id,
+            "question": payload.question,
+            "timestamp": "2024-04-02T12:00:00Z",  # Mock timestamp
+        }
+    )
+
+    logger.info(f"Processing query in session {payload.session_id}")
+    logger.info(f"Session history length: {len(sessions[payload.session_id])}")
+
     async def generate():
+        # Get number of questions in current session
+        question_count = len(sessions[payload.session_id])
+
         # Simulate streaming response with multiple chunks
         chunks = [
-            f"Processing your question (ID: {payload.query_id}): '{payload.question}'...\n",
-            "Analyzing the context...\n",
-            "Generating response...\n",
+            f"Processing your question (ID: {payload.query_id}, Session: {payload.session_id})...\n",
+            f"This is question #{question_count} in your session.\n",
+            "Analyzing the context and previous questions...\n",
             f"This is a mock streaming answer from agent '{payload.agent_id}'.\n",
-            "Finalizing response...\n",
+            "Here's your answer based on the conversation context...\n",
         ]
 
         for chunk in chunks:
@@ -239,23 +263,29 @@ async def submit_contact_form(contact: ContactFormRequest):
 # Document chunks visualization endpoint
 @app.get("/query/{query_id}/chunks")
 async def get_query_chunks(query_id: str):
-    """Get document chunks used to answer a specific query."""
-    # Mock response with sample chunks
-    chunks = [
-        DocumentChunk(
-            id="1",
-            content="This is a relevant document chunk...",
-            relevance_score=0.95,
-            source="document1.pdf",
-        ),
-        DocumentChunk(
-            id="2",
-            content="Another relevant piece of information...",
-            relevance_score=0.85,
-            source="document2.pdf",
-        ),
+    # Extract session_id from query_id (assuming format: session-{timestamp}-{random}-{timestamp})
+    session_id = "-".join(query_id.split("-")[:3])
+
+    # Log session context
+    if session_id in sessions:
+        logger.info(f"Fetching chunks for query {query_id} in session {session_id}")
+        logger.info(f"Session has {len(sessions[session_id])} questions")
+
+    # Mock chunks with session context
+    return [
+        {
+            "id": f"chunk1-{query_id}",
+            "content": f"This is a mock chunk for query {query_id} in session {session_id}.",
+            "source": "Mock Document 1",
+            "relevance_score": 0.95,
+        },
+        {
+            "id": f"chunk2-{query_id}",
+            "content": f"Another mock chunk showing session context. This session has {len(sessions.get(session_id, []))} questions.",
+            "source": "Mock Document 2",
+            "relevance_score": 0.85,
+        },
     ]
-    return chunks
 
 
 # Enhanced logging endpoint
@@ -370,3 +400,12 @@ async def get_shared_query(query_id: str):
         raise HTTPException(status_code=404, detail="Shared content not found")
 
     return mock_shared_queries[query_id]
+
+
+@app.get("/sessions/{session_id}/history")
+async def get_session_history(session_id: str):
+    """Get the conversation history for a specific session."""
+    if session_id not in sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    return sessions[session_id]

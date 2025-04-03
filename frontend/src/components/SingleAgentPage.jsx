@@ -23,11 +23,25 @@ function SingleAgentPage() {
   const [version, setVersion] = useState(null);
   const [chunks, setChunks] = useState([]);
   const [loadingChunks, setLoadingChunks] = useState(false);
+  const [selectedConversationId, setSelectedConversationId] = useState(null);
+  const [currentSessionId, setCurrentSessionId] = useState(null);
+  
   const chatEndRef = useRef(null);
   const latestConversationRef = useRef(null);
-  const [selectedConversationId, setSelectedConversationId] = useState(null);
 
   const { API_URL } = config;
+
+  // Generate new session ID on mount or page refresh
+  useEffect(() => {
+    const generateSessionId = () => {
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      return `session-${timestamp}-${randomStr}`;
+    };
+
+    setCurrentSessionId(generateSessionId());
+    console.log('🔄 New conversation session started');
+  }, []); // Empty dependency array means this runs once on mount
 
   // Fetch default agent on mount
   useEffect(() => {
@@ -109,9 +123,10 @@ function SingleAgentPage() {
   };
 
   const handleSubmit = async () => {
-    if (!question.trim()) return;
+    if (!question.trim() || !currentSessionId) return;
     
     console.log('🚀 Starting submission with question:', question);
+    console.log('📍 Current session:', currentSessionId);
     setLoadingQuery(true);
     setError("");
     setIsTyping(true);
@@ -119,13 +134,14 @@ function SingleAgentPage() {
     setChunks([]); // Reset chunks for new query
     
     try {
-      const queryId = `${agent.id}-${Date.now()}`;
+      const queryId = `${currentSessionId}-${Date.now()}`;
       const currentQuestion = question;
       
       // Add user message to conversation
       setConversations(prev => {
         const newConv = [...prev, {
           id: queryId,
+          sessionId: currentSessionId,
           question: currentQuestion,
           answer: "",
           timestamp: new Date().toISOString(),
@@ -151,7 +167,8 @@ function SingleAgentPage() {
         body: JSON.stringify({
           question: currentQuestion,
           agent_id: agent.id,
-          query_id: queryId
+          query_id: queryId,
+          session_id: currentSessionId
         }),
       });
 
@@ -277,6 +294,11 @@ function SingleAgentPage() {
               <div className="relative z-10">
                 <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
                 <p className="text-gray-600 mb-6">{agent?.description}</p>
+
+                {/* Session indicator */}
+                <div className="text-sm text-gray-500 mb-4">
+                  Session de conversation: {currentSessionId}
+                </div>
 
                 {/* Current conversation */}
                 <div className="mt-6 space-y-4">
