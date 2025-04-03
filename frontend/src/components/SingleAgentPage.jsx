@@ -5,6 +5,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
 import DefaultQueries from "./DefaultQueries";
 import TypingIndicator from "./TypingIndicator";
+import FeedbackComponent from "./FeedbackComponent";
 import ShareButtons from "./ShareButtons";
 import MetaTags from "./MetaTags";
 import config from "../config";
@@ -343,6 +344,14 @@ function SingleAgentPage() {
                             </div>
                           )}
                         </div>
+                        {conv.answer && (
+                          <div className="mt-4">
+                            <FeedbackComponent
+                              queryId={conv.id}
+                              agentId={agent?.id}
+                            />
+                          </div>
+                        )}
                       </div>
                     ))
                   )}

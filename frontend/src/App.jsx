@@ -40,7 +40,7 @@ function App() {
             </span>
           </div>
 
-          {/* Right side - Social links and Dashboard */}
+          {/* Right side - Social links */}
           <div className="flex items-center gap-4">
             <a
               href="https://github.com/Fr3nn3r"
@@ -58,12 +58,6 @@ function App() {
             >
               <FaLinkedin className="w-5 h-5" />
             </a>
-            <Link
-              to="/feedback"
-              className="text-sm text-gray-600 hover:text-primary transition-colors"
-            >
-              Feedback Dashboard
-            </Link>
           </div>
         </div>
       </nav>
