@@ -77,8 +77,8 @@ function FeedbackComponent({ queryId, agentId, onFeedbackSubmitted }) {
       <div className="flex items-center gap-1">
         <span className="text-sm text-gray-600 mr-2">
           {isSubmitted && !isEditing 
-            ? 'Thank you for your feedback!' 
-            : 'Was this response helpful?'}
+            ? 'Merci pour votre retour !' 
+            : 'Cette réponse vous a-t-elle été utile ?'}
         </span>
         <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
@@ -119,7 +119,7 @@ function FeedbackComponent({ queryId, agentId, onFeedbackSubmitted }) {
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Additional comments (optional)"
+            placeholder="Commentaires additionnels (optionnel)"
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows="2"
             disabled={isSubmitting}
