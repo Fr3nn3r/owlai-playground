@@ -289,7 +289,7 @@ function SingleAgentPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left panel - Suggested queries */}
           <div className="lg:col-span-3 hidden lg:block">
-            <div className="fixed w-[calc((100vw-4rem)/12*3-1rem)] bg-white/60 rounded-lg shadow-sm p-6">
+            <div className="fixed w-[calc((100vw-4rem)/12*3-1rem)] bg-blue-100/95 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-700">Questions Suggérées</h2>
               <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                 <DefaultQueries
@@ -370,7 +370,7 @@ function SingleAgentPage() {
 
           {/* Right panel - Document chunks */}
           <div className="lg:col-span-3 hidden lg:block">
-            <div className="fixed w-[calc((100vw-4rem)/12*3-1rem)] bg-white/60 rounded-lg shadow-sm p-6">
+            <div className="fixed w-[calc((100vw-4rem)/12*3-1rem)] bg-red-100/95 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-700">
                 Extraits
                 {selectedConversationId && (
@@ -421,11 +421,7 @@ function SingleAgentPage() {
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="text-gray-500 text-sm">
-                    Les extraits pertinents apparaîtront ici une fois que vous aurez posé une question.
-                  </div>
-                )}
+                ) : null}
               </div>
             </div>
           </div>
