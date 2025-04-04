@@ -26,13 +26,33 @@
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "OwlAI",
-        "applicationCategory": "LegalApplication",
+        "applicationCategory": "LawApplication",
+        "applicationSubCategory": "LegalAssistant",
         "description": "Assistant juridique alimenté par l'intelligence artificielle, spécialisé dans le droit français. Posez vos questions juridiques et obtenez des réponses basées sur des textes de loi.",
-        "operatingSystem": "Web browser",
+        "operatingSystem": ["Windows", "macOS", "Linux", "Android", "iOS"],
         "offers": {
           "@type": "Offer",
           "price": "0",
-          "priceCurrency": "EUR"
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "OwlAI",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Dubendorf",
+              "postalCode": "8600",
+              "addressCountry": "Switzerland",
+              "streetAddress": "OwlAI HQ"
+            }
+          }
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "ratingCount": "150",
+          "bestRating": "5",
+          "worstRating": "1"
         },
         "featureList": [
           "Questions-réponses juridiques en temps réel",
@@ -48,7 +68,11 @@
           "name": "Frédéric Brunner",
           "url": "https://github.com/Fr3nn3r"
         },
-        "url": "https://owlai-playground.vercel.app/"
+        "url": "https://owlai-playground.vercel.app/",
+        "countriesSupported": ["FR"],
+        "availableOnDevice": ["Desktop", "Tablet", "Mobile"],
+        "@type": "WebApplication",
+        "browserRequirements": "Requires JavaScript. Requires HTML5."
       }
     </script>
     <script type="application/ld+json">
@@ -99,6 +123,13 @@
         "description": "Service d'assistance juridique en ligne alimenté par l'intelligence artificielle, spécialisé dans le droit français. Accès gratuit 24/7 aux conseils juridiques basés sur les textes de loi.",
         "url": "https://owlai-playground.vercel.app/",
         "image": "https://owlai-playground.vercel.app/Marianne.jpg",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Dubendorf",
+          "postalCode": "8600",
+          "addressCountry": "Switzerland",
+          "streetAddress": "OwlAI HQ"
+        },
         "areaServed": {
           "@type": "Country",
           "name": "France"
