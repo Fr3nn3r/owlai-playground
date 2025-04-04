@@ -288,10 +288,10 @@ function SingleAgentPage() {
       <div className="container mx-auto px-4 py-8 relative z-10 pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left panel - Suggested queries */}
-          <div className="lg:col-span-3">
-            <div className="bg-white/60 rounded-lg shadow-sm p-6 sticky top-4">
+          <div className="lg:col-span-3 hidden lg:block">
+            <div className="fixed w-[calc((100vw-4rem)/12*3-1rem)] bg-white/60 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-700">Questions Suggérées</h2>
-              <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
+              <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                 <DefaultQueries
                   queries={defaultQueries}
                   onQuerySelect={query => setQuestion(query)}
@@ -302,7 +302,7 @@ function SingleAgentPage() {
           </div>
 
           {/* Main content area - center */}
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-6 lg:col-start-4">
             <div className="bg-white/70 hover:bg-white/90 rounded-lg shadow-sm p-6 mb-6 transition-all duration-200">
               <div className="relative z-10">
                 <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
@@ -369,8 +369,8 @@ function SingleAgentPage() {
           </div>
 
           {/* Right panel - Document chunks */}
-          <div className="lg:col-span-3">
-            <div className="bg-white/60 rounded-lg shadow-sm p-6 sticky top-4">
+          <div className="lg:col-span-3 hidden lg:block">
+            <div className="fixed w-[calc((100vw-4rem)/12*3-1rem)] bg-white/60 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-700">
                 Extraits
                 {selectedConversationId && (
@@ -379,7 +379,7 @@ function SingleAgentPage() {
                   </span>
                 )}
               </h2>
-              <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
+              <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                 {loadingChunks ? (
                   <div className="flex justify-center py-8">
                     <LoadingSpinner />
@@ -437,9 +437,9 @@ function SingleAgentPage() {
 
       {/* Floating input area */}
       <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="py-4">
+        <div className="py-4 bg-gradient-to-t from-gray-50 to-transparent">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto lg:col-start-4 lg:col-span-6">
               <div className="flex gap-4 items-center">
                 <div className="flex-1">
                   <QuestionInput
