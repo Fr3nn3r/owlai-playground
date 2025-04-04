@@ -16,10 +16,10 @@ function MetaTags({ title, description }) {
 
       {/* Open Graph meta tags for Facebook and LinkedIn */}
       <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://owlai-playground.vercel.app/" />
+      <meta property="og:url" content="https://owlai.fr/" />
       <meta property="og:title" content={title || "OwlAI - Intelligence Artificielle sur le droit français"} />
       <meta property="og:description" content={description || "OwlAI - Une intelligence artificielle gratuite 100% française et open source qui répond à des questions de droit."} />
-      <meta property="og:image" content="https://owlai-playground.vercel.app/Marianne.jpg" />
+      <meta property="og:image" content="https://owlai.fr/Marianne.jpg" />
       <meta property="og:site_name" content="OwlAI" />
       <meta property="og:locale" content="fr_FR" />
       <meta property="og:image:width" content="1200" />
@@ -31,7 +31,7 @@ function MetaTags({ title, description }) {
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title || "OwlAI - Intelligence Artificielle sur le droit français"} />
       <meta name="twitter:description" content={description || "OwlAI - Une intelligence artificielle gratuite 100% française et open source qui répond à des questions de droit."} />
-      <meta name="twitter:image" content="https://owlai-playground.vercel.app/Marianne.jpg" />
+      <meta name="twitter:image" content="https://owlai.fr/Marianne.jpg" />
     </Helmet>
   );
 }

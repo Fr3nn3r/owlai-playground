@@ -21,12 +21,10 @@ app = FastAPI()
 # Configure CORS middleware with explicit origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://owlai-playground.vercel.app", "http://localhost:5173"],
+    allow_origins=["https://owlai.fr", "http://localhost:5173"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
-    max_age=3600,
 )
 
 
@@ -43,10 +41,8 @@ async def log_requests(request, call_next):
         logger.info(f"Response headers: {dict(response.headers)}")
 
         # Add CORS headers explicitly for the production origin
-        if request.headers.get("origin") == "https://owlai-playground.vercel.app":
-            response.headers["Access-Control-Allow-Origin"] = (
-                "https://owlai-playground.vercel.app"
-            )
+        if request.headers.get("origin") == "https://owlai.fr":
+            response.headers["Access-Control-Allow-Origin"] = "https://owlai.fr"
             response.headers["Access-Control-Allow-Credentials"] = "true"
             response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "*"
@@ -65,11 +61,11 @@ async def options_handler(request):
     logger.info(f"OPTIONS headers: {dict(request.headers)}")
 
     origin = request.headers.get("origin")
-    if origin == "https://owlai-playground.vercel.app":
+    if origin == "https://owlai.fr":
         return Response(
             status_code=200,
             headers={
-                "Access-Control-Allow-Origin": "https://owlai-playground.vercel.app",
+                "Access-Control-Allow-Origin": "https://owlai.fr",
                 "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Credentials": "true",
@@ -325,7 +321,7 @@ async def get_query_logs(query_id: str):
 @app.get("/version")
 async def get_version():
     """Get the current version of OwlAI."""
-    return {"version": "0.2.0"}
+    return {"version": "0.2.2"}
 
 
 @app.get("/feedback/all")

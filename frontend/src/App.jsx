@@ -36,7 +36,7 @@ function App() {
               OwlAI
             </span>
             <span className="text-sm text-gray-500">
-              v0.2.1
+              v0.2.2
             </span>
           </div>
 

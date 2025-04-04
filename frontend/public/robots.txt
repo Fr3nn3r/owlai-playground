@@ -2,5 +2,5 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://owlai-playground.vercel.app/sitemap.xml 
+# Sitemap
+Sitemap: https://owlai.fr/sitemap.xml 

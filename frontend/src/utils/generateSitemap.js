@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = 'https://owlai-playground.vercel.app';
+const BASE_URL = 'https://owlai.fr';
 
 // Add your routes here
 const routes = [

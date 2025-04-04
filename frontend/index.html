@@ -17,7 +17,7 @@
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content="https://owlai-playground.vercel.app/" />
+    <meta property="og:url" content="https://owlai.fr/" />
     <meta property="og:image:alt" content="OwlAI - Intelligence Artificielle sur le droit français" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta name="keywords" content="Juridique, assistance, législation, civil, pénal, travail, réglementation, contentieux, impôts, anonyme"/>
@@ -26,26 +26,15 @@
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "OwlAI",
-        "applicationCategory": "LawApplication",
-        "applicationSubCategory": "LegalAssistant",
+        "applicationCategory": "BusinessApplication",
+        "applicationSubCategory": "Legal Software",
         "description": "Assistant juridique alimenté par l'intelligence artificielle, spécialisé dans le droit français. Posez vos questions juridiques et obtenez des réponses basées sur des textes de loi.",
-        "operatingSystem": ["Windows", "macOS", "Linux", "Android", "iOS"],
+        "operatingSystem": "Any",
         "offers": {
           "@type": "Offer",
           "price": "0",
           "priceCurrency": "EUR",
-          "availability": "https://schema.org/InStock",
-          "seller": {
-            "@type": "Organization",
-            "name": "OwlAI",
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Dubendorf",
-              "postalCode": "8600",
-              "addressCountry": "Switzerland",
-              "streetAddress": "OwlAI HQ"
-            }
-          }
+          "availability": "https://schema.org/InStock"
         },
         "aggregateRating": {
           "@type": "AggregateRating",
@@ -61,17 +50,53 @@
           "Suggestions de questions prédéfinies"
         ],
         "inLanguage": "fr",
-        "softwareVersion": "0.2.1",
-        "screenshot": "https://owlai-playground.vercel.app/Screenshot%202025-04-04.jpg",
+        "softwareVersion": "0.2.2",
+        "screenshot": "https://owlai.fr/Screenshot%202025-04-04.jpg",
         "author": {
           "@type": "Person",
           "name": "Frédéric Brunner",
           "url": "https://github.com/Fr3nn3r"
         },
-        "url": "https://owlai-playground.vercel.app/",
-        "countriesSupported": ["FR"],
-        "availableOnDevice": ["Desktop", "Tablet", "Mobile"],
-        "browserRequirements": "Requires JavaScript. Requires HTML5."
+        "url": "https://owlai.fr/"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "OwlAI",
+        "url": "https://owlai.fr/",
+        "image": "https://owlai.fr/Marianne.jpg",
+        "description": "Assistant juridique alimenté par l'intelligence artificielle, spécialisé dans le droit français."
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LegalService",
+        "name": "OwlAI",
+        "serviceType": "Legal Information",
+        "areaServed": "FR",
+        "description": "Assistant juridique alimenté par l'intelligence artificielle, spécialisé dans le droit français.",
+        "serviceUrl": "https://owlai.fr/",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "OwlAI HQ",
+          "addressLocality": "Dubendorf",
+          "postalCode": "8600",
+          "addressCountry": "Switzerland"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://owlai.fr/"
+        },
+        "query-input": "required name=search_term_string"
       }
     </script>
     <script type="application/ld+json">
@@ -120,8 +145,8 @@
         "@type": "LegalService",
         "name": "OwlAI - Assistant Juridique",
         "description": "Service d'assistance juridique en ligne alimenté par l'intelligence artificielle, spécialisé dans le droit français. Accès gratuit 24/7 aux conseils juridiques basés sur les textes de loi.",
-        "url": "https://owlai-playground.vercel.app/",
-        "image": "https://owlai-playground.vercel.app/Marianne.jpg",
+        "url": "https://owlai.fr/",
+        "image": "https://owlai.fr/Marianne.jpg",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Dubendorf",
@@ -135,7 +160,7 @@
         },
         "availableChannel": {
           "@type": "ServiceChannel",
-          "serviceUrl": "https://owlai-playground.vercel.app/",
+          "serviceUrl": "https://owlai.fr/",
           "serviceType": "Online Service"
         },
         "provider": {
@@ -185,7 +210,7 @@
           "@type": "AskAction",
           "target": {
             "@type": "EntryPoint",
-            "urlTemplate": "https://owlai-playground.vercel.app/",
+            "urlTemplate": "https://owlai.fr/",
             "description": "Interface de conversation pour poser des questions juridiques"
           }
         }
