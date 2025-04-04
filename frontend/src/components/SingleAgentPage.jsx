@@ -290,14 +290,11 @@ function SingleAgentPage() {
           {/* Left panel - Suggested queries */}
           <div className="lg:col-span-3 hidden lg:block">
             <div className="fixed w-[calc((100vw-4rem)/12*3-1rem)] bg-blue-100/95 rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4 text-gray-700">Questions Suggérées</h2>
-              <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-                <DefaultQueries
-                  queries={defaultQueries}
-                  onQuerySelect={query => setQuestion(query)}
-                  selectedAgent={agent}
-                />
-              </div>
+              <DefaultQueries
+                queries={defaultQueries}
+                onQuerySelect={query => setQuestion(query)}
+                selectedAgent={agent}
+              />
             </div>
           </div>
 
@@ -372,7 +369,7 @@ function SingleAgentPage() {
           <div className="lg:col-span-3 hidden lg:block">
             <div className="fixed w-[calc((100vw-4rem)/12*3-1rem)] bg-red-100/95 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-700">
-                Extraits
+                Extraits de loi
                 {selectedConversationId && (
                   <span className="text-sm font-normal text-gray-500 ml-2">
                     pour la question sélectionnée
