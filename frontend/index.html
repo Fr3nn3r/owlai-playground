@@ -21,7 +21,145 @@
     <meta property="og:image:alt" content="OwlAI - Intelligence Artificielle sur le droit français" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta name="keywords" content="Juridique, assistance, législation, civil, pénal, travail, réglementation, contentieux, impôts, anonyme"/>
-    
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "OwlAI",
+        "applicationCategory": "LegalApplication",
+        "description": "Assistant juridique alimenté par l'intelligence artificielle, spécialisé dans le droit français. Posez vos questions juridiques et obtenez des réponses basées sur des textes de loi.",
+        "operatingSystem": "Web browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        },
+        "featureList": [
+          "Questions-réponses juridiques en temps réel",
+          "Extraits de textes de loi pertinents",
+          "Interface conversationnelle",
+          "Suggestions de questions prédéfinies"
+        ],
+        "inLanguage": "fr",
+        "softwareVersion": "0.2.0",
+        "screenshot": "https://owlai-playground.vercel.app/Screenshot%202025-04-04.jpg",
+        "author": {
+          "@type": "Person",
+          "name": "Frédéric Brunner",
+          "url": "https://github.com/Fr3nn3r"
+        },
+        "url": "https://owlai-playground.vercel.app/"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Legislation",
+        "name": "Droit Français",
+        "legislationType": "consolidated",
+        "jurisdiction": {
+          "@type": "Country",
+          "name": "France"
+        },
+        "inLanguage": "fr",
+        "keywords": [
+          "droit civil",
+          "droit pénal",
+          "droit du travail",
+          "réglementation",
+          "contentieux",
+          "droit fiscal"
+        ],
+        "legislationLegalForce": {
+          "@id": "https://schema.org/InForce"
+        },
+        "description": "Ensemble des textes de loi français couvrant le droit civil, pénal, du travail et autres domaines juridiques.",
+        "workExample": [
+          {
+            "@type": "Legislation",
+            "inLanguage": "fr",
+            "encoding": [
+              {
+                "@type": "LegislationObject",
+                "encodingFormat": "text/html",
+                "legislationLegalValue": {
+                  "@id": "https://schema.org/OfficialLegalValue"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LegalService",
+        "name": "OwlAI - Assistant Juridique",
+        "description": "Service d'assistance juridique en ligne alimenté par l'intelligence artificielle, spécialisé dans le droit français. Accès gratuit 24/7 aux conseils juridiques basés sur les textes de loi.",
+        "url": "https://owlai-playground.vercel.app/",
+        "image": "https://owlai-playground.vercel.app/Marianne.jpg",
+        "areaServed": {
+          "@type": "Country",
+          "name": "France"
+        },
+        "availableChannel": {
+          "@type": "ServiceChannel",
+          "serviceUrl": "https://owlai-playground.vercel.app/",
+          "serviceType": "Online Service"
+        },
+        "provider": {
+          "@type": "Person",
+          "name": "Frédéric Brunner",
+          "url": "https://github.com/Fr3nn3r"
+        },
+        "serviceType": "Legal Consultation",
+        "termsOfService": "Gratuit et open source",
+        "audience": {
+          "@type": "Audience",
+          "audienceType": "Public"
+        },
+        "serviceOutput": "Conseils juridiques et extraits de textes de loi pertinents",
+        "availabilityStarts": "2024-01-01",
+        "priceRange": "0",
+        "paymentAccepted": "Gratuit",
+        "openingHours": "Mo-Su 00:00-24:00",
+        "knowsLanguage": "fr"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Message",
+        "sender": {
+          "@type": "Person",
+          "name": "Utilisateur"
+        },
+        "recipient": {
+          "@type": "SoftwareApplication",
+          "name": "OwlAI",
+          "applicationCategory": "LegalApplication"
+        },
+        "about": {
+          "@type": "Thing",
+          "name": "Questions juridiques"
+        },
+        "messageAttachment": {
+          "@type": "CreativeWork",
+          "name": "Extraits de textes de loi",
+          "description": "Extraits pertinents de la législation française"
+        },
+        "inLanguage": "fr",
+        "potentialAction": {
+          "@type": "AskAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://owlai-playground.vercel.app/",
+            "description": "Interface de conversation pour poser des questions juridiques"
+          }
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -7,9 +7,9 @@ const DefaultQueries = ({ queries, onQuerySelect, selectedAgent }) => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <h2 className="text-lg font-semibold mb-4 text-gray-700">Questions Suggérées</h2>
-      <div className="space-y-3">
+      <div className="space-y-3 overflow-y-auto flex-1 pr-2" style={{ maxHeight: 'calc(100vh - 200px)' }}>
         {queries.map((query, index) => (
           <button
             key={index}
