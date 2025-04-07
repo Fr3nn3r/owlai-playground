@@ -321,7 +321,7 @@ async def get_query_logs(query_id: str):
 @app.get("/version")
 async def get_version():
     """Get the current version of OwlAI."""
-    return {"version": "0.2.2"}
+    return {"version": "0.3.1"}
 
 
 @app.get("/feedback/all")

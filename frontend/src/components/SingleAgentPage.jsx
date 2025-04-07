@@ -287,9 +287,9 @@ function SingleAgentPage() {
       {/* Main content container */}
       <div className="container mx-auto px-4 py-8 relative z-10 pb-32 max-w-[1920px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left panel - Suggested queries */}
+          {/* Left panel - Suggested queries (Blue) */}
           <div className="lg:col-span-3 hidden lg:block">
-            <div className="fixed w-[calc(min(400px,((100vw-4rem)/12*3-1rem)))] bg-blue-100/95 rounded-lg shadow-sm p-6 overflow-hidden" style={{ height: 'calc(100vh - 2rem)' }}>
+            <div className="fixed w-[calc(min(400px,((100vw-4rem)/12*3-1rem)))] bg-blue-100 rounded-lg shadow-sm p-6 overflow-hidden border-2 border-blue-200" style={{ height: 'calc(100vh - 2rem)' }}>
               <DefaultQueries
                 queries={defaultQueries}
                 onQuerySelect={query => setQuestion(query)}
@@ -298,9 +298,9 @@ function SingleAgentPage() {
             </div>
           </div>
 
-          {/* Main content area - center */}
+          {/* Main content area - center (White) */}
           <div className="lg:col-span-6 lg:col-start-4 max-w-4xl mx-auto w-full">
-            <div className="bg-white/70 hover:bg-white/90 rounded-lg shadow-sm p-6 mb-6 transition-all duration-200">
+            <div className="bg-white/90 hover:bg-white rounded-lg shadow-sm p-6 mb-6 transition-all duration-200 border border-gray-100">
               <div className="relative z-10">
                 <h1 className="text-2xl font-bold mb-4">{agent?.welcome_title || "Chargement..."}</h1>
                 <p className="text-gray-600 mb-6">{agent?.description}</p>
@@ -365,9 +365,9 @@ function SingleAgentPage() {
             </div>
           </div>
 
-          {/* Right panel - Document chunks */}
+          {/* Right panel - Document chunks (Red) */}
           <div className="lg:col-span-3 hidden lg:block">
-            <div className="fixed w-[calc(min(400px,((100vw-4rem)/12*3-1rem)))] bg-red-100/95 rounded-lg shadow-sm p-6">
+            <div className="fixed w-[calc(min(400px,((100vw-4rem)/12*3-1rem)))] bg-red-100 rounded-lg shadow-sm p-6 border-2 border-red-200" style={{ height: 'calc(100vh - 2rem)' }}>
               <h2 className="text-lg font-semibold mb-4 text-gray-700">
                 Extraits de loi
                 {selectedConversationId && (
@@ -376,7 +376,7 @@ function SingleAgentPage() {
                   </span>
                 )}
               </h2>
-              <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <div className="overflow-y-auto" style={{ height: 'calc(100vh - 8rem)' }}>
                 {loadingChunks ? (
                   <div className="flex justify-center py-8">
                     <LoadingSpinner />
