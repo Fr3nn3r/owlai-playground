@@ -390,8 +390,17 @@ function SingleAgentPage() {
                         data-chunk-id={chunk.id}
                       >
                         <div className="flex justify-between items-start mb-2">
-                          <div className="text-xs text-gray-600">
-                            {chunk.source}
+                          <div className="flex items-center gap-2">
+                            <div className="text-xs text-gray-600">
+                              {chunk.source}
+                            </div>
+                            <div className={`text-xs font-medium px-2 py-0.5 rounded ${
+                              chunk.relevance_score >= 5 ? 'bg-green-100 text-green-800' :
+                              chunk.relevance_score >= 0 ? 'bg-blue-100 text-blue-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              Score: {Number(chunk.relevance_score).toFixed(2)}
+                            </div>
                           </div>
                           <button
                             onClick={(e) => {
